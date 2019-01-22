@@ -183,7 +183,7 @@ def step(action):
         obs+=loc
     res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
     if(loc[2]<0.05 or np.isnan(loc[2]) or abs(loc[2])>1e+10):
-        reward -=20
+        reward =-20
         print("@@@@@@ E X P L O D E @@@@@@")
         done = True
     # print(loc, end = " ")
@@ -202,10 +202,11 @@ def step(action):
     dst = distance(obs)
     # print(dst , bestdist)
     # print("orientation:", obs[-5])
-    if(bestdist > dst):
+    if(bestdist > dst and not done):
         reward += 2*(bestdist - dst)
         bestdist = dst
-    reward += min(0,lastdist -  dst)
+    if(not done):
+        reward += min(0,lastdist -  dst)
     lastdist = dst
     if(dst < 0.5):
         reward  =20
