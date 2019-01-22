@@ -39,13 +39,14 @@ trainer = train.Trainer(S_DIM, A_DIM, A_MAX, ram)
 RESUME = 0
 if(RESUME):
     trainer.load_models(RESUME)
-
+total_reward = 0
 def main():
     for _ep in range(MAX_EPISODES):
         (obs,tpo) = env.reset()
         observation = obs+list(tpo.reshape(-1,))
         _ep = _ep+RESUME
-
+        print("last total reward:", total_reward)
+        total_reward = 0
         print ('EPISODE :- ', _ep)
         for r in range(MAX_STEPS):
 
@@ -55,6 +56,7 @@ def main():
 
             # new_observation, reward, done, info = env.step(action)
             (obs,tpo), reward, done, info = env.step(action)
+            total_reward += reward
             new_observation = obs+list(tpo.reshape(-1,))
 
             if done:

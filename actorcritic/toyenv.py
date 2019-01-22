@@ -111,7 +111,7 @@ def reset():
     time.sleep(5)
     status = vrep.simxStartSimulation(clientID, vrep.simx_opmode_blocking)
     recover(n=30)
-    print("status",status)
+    # print("status",status)
 
     global target
     global lastdist
@@ -200,8 +200,8 @@ def step(action):
     obs.append(SIDE)
     assert(len(obs)==16)
     dst = distance(obs)
-    print(dst , bestdist)
-    print("orientation:", obs[-5])
+    # print(dst , bestdist)
+    # print("orientation:", obs[-5])
     if(bestdist > dst):
         reward += 2*(bestdist - dst)
         bestdist = dst
@@ -213,7 +213,7 @@ def step(action):
     if(dst > 15):
         reward -= 20
         done = True
-    print(reward)
+    # print(reward)
 
     info = None
     if(OBSERVETOPO):
