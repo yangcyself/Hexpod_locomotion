@@ -6,7 +6,7 @@ import time
 import numpy as np
 
 SIDE = 0
-
+PAIN_GAMMA = 1
 OBSERVETOPO = True
 
 ORIPOS=np.array([[ 5.27530670e-01 , 3.04633737e-01,-5.4652e-01],
@@ -157,6 +157,7 @@ def exit():
     vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
 
 def step(action):
+
     global lastdist
     global bestdist
     global SIDE
@@ -179,7 +180,12 @@ def step(action):
     obs = []
     for i in range(6):
         res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)
+        #painful
+        pain  = loc[0]**2+loc[1]**2 - 0.49
+        if(pain>0):
+            reward -= pain
         loc = list(loc[:-1])
+        
         obs+=loc
     res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
     if(loc[2]<0.05 or np.isnan(loc[2]) or abs(loc[2])>1e+10):
@@ -192,7 +198,7 @@ def step(action):
     # res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
     # loc = list(loc)
     # obs+=loc
-
+    
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
     obs+=list(difftarget)
     # print(difftarget,end = " ")
