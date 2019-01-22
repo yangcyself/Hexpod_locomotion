@@ -39,8 +39,8 @@ trainer = train.Trainer(S_DIM, A_DIM, A_MAX, ram)
 RESUME = 0
 if(RESUME):
     trainer.load_models(RESUME)
-total_reward = 0
 def main():
+    total_reward = 0
     for _ep in range(MAX_EPISODES):
         (obs,tpo) = env.reset()
         observation = obs+list(tpo.reshape(-1,))
