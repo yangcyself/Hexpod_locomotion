@@ -17,6 +17,9 @@ WORLD_SIZE = [-5,5]
 NAME = {} # name -> handle
 HANDLE = {}# handle -> obj
 H_count = 0
+
+#whether make sure that the body position is near the middle of the fixed legs
+STRICT_BALANCE = True 
 DISPLAY = False
 # DISPLAY = True
 
@@ -324,6 +327,19 @@ class Hexpod(rep_obj):
                 print("tip %d and %d are to close" %(i, (i+1)%6))
                 self.explode()
         #防止失去平衡
+        if(STRICT_BALANCE):
+            #assume that only one set of three legs is fixed, as the ave of all six is 0
+            sumloc = np.zeros((2,))
+            maxlen = 0
+            for i in range(0,6):
+                maxlen = max(maxlen, self.tips[i].p[0]**2+self.tips[i].p[1]**2)
+                if(i%2==0):
+                    sumloc += self.tips[i].p
+            sumloc = sumloc/3
+            if(maxlen < sumloc[0]**2+sumloc[1]**2 + 0.005 ): #0.005 is some margin
+                print("ERROR BODY LOSE BALANCE")
+                self.explode()
+
             
 class Goal(rep_obj):
     def __init__(self):
