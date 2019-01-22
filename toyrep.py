@@ -237,11 +237,27 @@ class Hexpod(rep_obj):
 
         self.loc_sol = []
         self.ori_sol = []
+        tmin_loc = 2
+        tmin_t = self.tips[0]
         for t in self.tips:
             if(t.fixed()):
                 newloc = t.loc - t.p # as the height has no influence of the ang
+                # if(tmin_loc>t.loc[2]):
+                #     tmin_loc = t.loc[2]
+                #     tmin_t = t
+
                 self.loc_sol.append(newloc)
-        
+
+        #To solve the problem Error: zero-size array to reduction operation maximum which has no identity
+        if(len(self.loc_sol)==0):
+            print("ERROR, self.loc_sol empty \n DATAS: \n")
+            print("t.loc | t.p")
+            for t in self.tips:
+                print(t.loc,t.p)
+            print("self.loc",self.loc,"self.ori",self.ori)
+            #set loc accoring to least leg
+            self.loc_sol = [tmin_t.loc - tmin_t.p]
+
         self.loc[2] = np.max(np.array(self.loc_sol),axis=0)[2]
         for t in self.tips:
             t.loc[2] = self.loc[2] + t.p[2]
