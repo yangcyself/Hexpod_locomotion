@@ -256,7 +256,7 @@ class Hexpod(rep_obj):
                 print(t.loc,t.p)
             print("self.loc",self.loc,"self.ori",self.ori)
             #set loc accoring to least leg
-            self.loc_sol = [tmin_t.loc - tmin_t.p]
+            self.loc_sol = [np.array([0,0,tmin_t.loc - tmin_t.p])]
 
         self.loc[2] = np.max(np.array(self.loc_sol),axis=0)[2]
         for t in self.tips:
@@ -323,7 +323,7 @@ class Hexpod(rep_obj):
             if(distance(t1.loc,t2.loc)<=0.02):
                 print("tip %d and %d are to close" %(i, (i+1)%6))
                 self.explode()
-            
+        #防止失去平衡
             
 class Goal(rep_obj):
     def __init__(self):

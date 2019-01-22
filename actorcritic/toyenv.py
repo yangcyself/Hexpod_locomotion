@@ -181,7 +181,7 @@ def step(action):
     for i in range(6):
         res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)
         #painful
-        pain  = loc[0]**2+loc[1]**2 - 0.49
+        pain  = loc[0]**2+loc[1]**2 - 0.5
         if(pain>0):
             reward -= pain
         loc = list(loc[:-1])
