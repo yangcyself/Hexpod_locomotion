@@ -20,6 +20,7 @@ H_count = 0
 
 #whether make sure that the body position is near the middle of the fixed legs
 STRICT_BALANCE = True 
+TIPS_order = True
 DISPLAY = False
 # DISPLAY = True
 
@@ -230,6 +231,11 @@ class Hexpod(rep_obj):
                     0.646,
                     "-g")
 
+    def printState(self):
+        print("t.loc | t.p")
+        for t in self.tips:
+            print(t.loc,t.p)
+        print("self.loc",self.loc,"self.ori",self.ori)
 
     def refresh(self):
         #solve the position of body
@@ -254,10 +260,7 @@ class Hexpod(rep_obj):
         #To solve the problem Error: zero-size array to reduction operation maximum which has no identity
         if(len(self.loc_sol)==0):
             print("ERROR, self.loc_sol empty \n DATAS: \n")
-            print("t.loc | t.p")
-            for t in self.tips:
-                print(t.loc,t.p)
-            print("self.loc",self.loc,"self.ori",self.ori)
+            self.printState()
             #set loc accoring to least leg
             self.loc_sol = [np.array([0,0,tmin_t.loc - tmin_t.p])]
 
@@ -334,13 +337,23 @@ class Hexpod(rep_obj):
             for i in range(0,6):
                 maxlen = max(maxlen, self.tips[i].p[0]**2+self.tips[i].p[1]**2)
                 if(i%2==0):
-                    sumloc += self.tips[i].p
+                    sumloc += self.tips[i].p[:2]
             sumloc = sumloc/3
             if(maxlen < sumloc[0]**2+sumloc[1]**2 + 0.005 ): #0.005 is some margin
-                print("ERROR BODY LOSE BALANCE")
+                print("CHECK BODY LOSE BALANCE")
+                self.printState()
                 self.explode()
-
-            
+        if(TIPS_order):
+            for i in range(0,3):
+                if(not i*math.pi/3 < math.atan2(self.tips[i].p[1],self.tips[i].p[0]) < (i+1)*math.pi/3):
+                    print("CHECK FOOT ORDER",i)
+                    self.printState()
+                    self.explode()
+            for i in range(3,6):
+                if(not (3-i)*math.pi/3 > math.atan2(self.tips[i].p[1],self.tips[i].p[0]) > (2-i)*math.pi/3):
+                    print("CHECK FOOT ORDER",i)
+                    self.printState()
+                    self.explode()
 class Goal(rep_obj):
     def __init__(self):
         self.loc = np.array([5,5,5])
