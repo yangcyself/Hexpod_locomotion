@@ -15,8 +15,8 @@ BATCH_SIZE = 128
 LEARNING_RATE = 0.001
 GAMMA = 0.99
 TAU = 0.001
-
-
+USEGPU =  torch.cuda.is_available()
+print("trainUSEGPU:",USEGPU)
 class Trainer:
 
 	def __init__(self, state_dim, action_dim, action_lim, ram):
@@ -42,6 +42,12 @@ class Trainer:
 		self.target_critic = model.Critic(self.state_dim, self.action_dim)
 		self.critic_optimizer = torch.optim.Adam(self.critic.parameters(),LEARNING_RATE)
 
+		if(USEGPU):
+			self.target_actor = self.target_actor.cuda()
+			self.actor = self.actor.cuda()
+			self.target_critic = self.target_critic.cuda()
+			self.critic = self.critic.cuda()
+
 		utils.hard_update(self.target_actor, self.actor)
 		utils.hard_update(self.target_critic, self.critic)
 
@@ -52,7 +58,11 @@ class Trainer:
 		:return: sampled action (Numpy array)
 		"""
 		state = Variable(torch.from_numpy(state))
+		if(USEGPU):
+    			state = state.cuda()
 		action = self.target_actor.forward(state).detach()
+		if(USEGPU):
+    			action = action.cpu()
 		return action.data.numpy()
 
 	def get_exploration_action(self, state):
@@ -62,7 +72,11 @@ class Trainer:
 		:return: sampled action (Numpy array)
 		"""
 		state = Variable(torch.from_numpy(state))
+		if(USEGPU):
+			state = state.cuda()
 		action = self.actor.forward(state).detach()
+		if(USEGPU):
+    			action = action.cpu()
 		new_action = action.data.numpy() + (self.noise.sample() * self.action_lim)
 		return new_action
 
@@ -77,6 +91,11 @@ class Trainer:
 		a1 = Variable(torch.from_numpy(a1))
 		r1 = Variable(torch.from_numpy(r1))
 		s2 = Variable(torch.from_numpy(s2))
+		if(USEGPU):
+			s1 = s1.cuda()
+			a1 = a1.cuda()
+			r1 = r1.cuda()
+			s2 = s2.cuda()
 
 		# ---------------------- optimize critic ----------------------
 		# Use target actor exploitation policy here for loss evaluation

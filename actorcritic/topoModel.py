@@ -5,6 +5,9 @@ import numpy as np
 
 EPS = 0.003
 
+USEGPU =  torch.cuda.is_available()
+print("ModelUSEGPU:",USEGPU)
+
 def fanin_init(size, fanin=None):
 	fanin = fanin or size[0]
 	v = 1. / np.sqrt(fanin)
@@ -71,6 +74,8 @@ class Actor(nn.Module):
 		self.state_dim = state_dim
 		self.action_dim = action_dim
 		self.action_lim = action_lim
+		if(USEGPU):
+			self.action_lim = torch.tensor(self.action_lim).cuda()
 
 		self.state_dim = torch.from_numpy(np.array(state_dim)).float()
 		self.action_dim = torch.from_numpy(np.array(action_dim)).float()
@@ -102,7 +107,7 @@ class Actor(nn.Module):
 		x = F.relu(self.fc3(x))
 		action = F.tanh(self.fc4(x))
 
-		action = action * self.action_lim
+		action = action * self.action_lim.cuda()
 
 		return action
 
