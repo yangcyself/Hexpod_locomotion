@@ -287,7 +287,8 @@ class Cylinder(rep_obj):
 Toy-rep environment
 """
 hexpod = Hexpod()
-OBJS = [hexpod,Goal()]
+goal = Goal()
+OBJS = [hexpod,goal]
 CLDS = []
 for i in range(0, 10):
     CLDS.append(Cylinder( 0.1 , 'Barrier' + str(i)))
@@ -395,7 +396,7 @@ def simxGetObjectPosition(ID, obj, cdn, opmod):
     if(obj.parent==cdn):
         # CALL ROBOT API
         return 1,obj.p
-    if(obj == Goal):
+    if(obj == goal):
         return 1,turnVec(obj.loc-cdn.loc,-cdn.ori)
         
 
