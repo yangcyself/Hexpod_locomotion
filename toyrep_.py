@@ -8,21 +8,15 @@ N=5
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
-# from pexpect import pxssh
 import math
 import numpy as np
 import time
-import slamListener
 
 WORLD_SIZE = [-5,5]
 
 NAME = {} # name -> handle
 HANDLE = {}# handle -> obj
 H_count = 0
-
-#whether make sure that the body position is near the middle of the fixed legs
-STRICT_BALANCE = True 
-TIPS_order = True
 DISPLAY = False
 # DISPLAY = True
 
@@ -185,12 +179,54 @@ class Hexpod(rep_obj):
     def toGlob(self,vec):
         return turnVec(vec,self.ori)
 
-
-    def printState(self):
-        print("t.loc | t.p")
+    def explode(self):
         for t in self.tips:
-            print(t.loc,t.p)
-        print("self.loc",self.loc,"self.ori",self.ori)
+            t.p*=1000000
+            t.loc*=1000000
+            t.state = False
+        self.state = False
+        self.loc = np.array([1e+22]*3)
+        # for t in self.shape_nodes:
+        #     t.state = False
+        
+    def draw(self,ax):
+        # plt.clf()
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111,projection='3d')
+
+        # ax.plot([0,0,1],[0,1,1],1,"-b")
+        for i,t in enumerate(self.tips):
+            # ax.plot([self.loc[0],t.loc[0]],
+            #         [self.loc[1],t.loc[1]],
+            #         [self.loc[2],t.loc[2]],
+            #         "-r")
+            for j in range(i,len(self.shape_nodes),6):
+                ax.plot([self.shape_nodes[j].loc[0],t.loc[0]],
+                        [self.shape_nodes[j].loc[1],t.loc[1]],
+                        [self.shape_nodes[j].loc[2],t.loc[2]],
+                        "-b")
+        x = []
+        y = []
+        z = []
+        for i in range(len(self.shape_nodes)):
+            x.append(self.shape_nodes[i].loc[0])
+            y.append(self.shape_nodes[i].loc[1])
+            z.append(self.shape_nodes[i].loc[2])
+        ax.plot(x,y,z,"-b")
+        #draw orientation
+        for i in self.ori_sol:
+            orivec = np.array([math.cos(i),math.sin(i)]) * 0.5
+            ax.plot([self.loc[0],self.loc[0]+orivec[0]],
+                        [self.loc[1],self.loc[1]+orivec[1]],
+                        0.646,
+                        "-r")
+        i = self.ori
+        orivec = np.array([math.cos(i),math.sin(i)]) * 0.5
+        ax.plot([self.loc[0],self.loc[0]+orivec[0]],
+                    [self.loc[1],self.loc[1]+orivec[1]],
+                    0.646,
+                    "-g")
+
 
     def refresh(self):
         #solve the position of body
@@ -201,24 +237,11 @@ class Hexpod(rep_obj):
 
         self.loc_sol = []
         self.ori_sol = []
-        tmin_loc = 2
-        tmin_t = self.tips[0]
         for t in self.tips:
             if(t.fixed()):
                 newloc = t.loc - t.p # as the height has no influence of the ang
-                # if(tmin_loc>t.loc[2]):
-                #     tmin_loc = t.loc[2]
-                #     tmin_t = t
-
                 self.loc_sol.append(newloc)
-
-        #To solve the problem Error: zero-size array to reduction operation maximum which has no identity
-        if(len(self.loc_sol)==0):
-            print("ERROR, self.loc_sol empty \n DATAS: \n")
-            self.printState()
-            #set loc accoring to least leg
-            self.loc_sol.append(tmin_t.loc - tmin_t.p)
-
+        
         self.loc[2] = np.max(np.array(self.loc_sol),axis=0)[2]
         for t in self.tips:
             t.loc[2] = self.loc[2] + t.p[2]
@@ -245,8 +268,47 @@ class Hexpod(rep_obj):
         for t in self.shape_nodes:
             t.loc = self.loc+ self.toGlob(t.p)
     
+    def check_line_collision(self,start,end):
+        num = 10
+        X=  np.linspace(start[0],end[0],num)
+        Y =  np.linspace(start[1],end[1],num)
+        Z =  np.linspace(start[2],end[2],num)
+        for x,y,z in zip(X,Y,Z):
+            if(z<TOPO(x,y)-0.005):
+                print(x,y,z,start,end)
+                print("Leg collision with topo")
+                self.explode()
+                break
+                # assert(len("Leg collision with topo")==0)
 
+    def collision_check(self):
+        #make the low steps to 0
+        if(not self.state):
+            return
+            
+        for i,t in enumerate(self.tips):
+            if(t.loc[2]<TOPO(t.loc[0],t.loc[1])-0.005):
+                print(t.loc)
+                # assert(len("The Tips is in the topo")==0)
+                print("The Tips is in the topo")
+                self.explode()
+                break
 
+            elif(t.loc[2]<=TOPO(t.loc[0],t.loc[1])+0.005):
+                t.loc[2] = TOPO(t.loc[0],t.loc[1])
+            #GO throw every leg_edges
+            for j in range(i,len(self.shape_nodes),6):
+                self.check_line_collision(self.shape_nodes[j].loc,t.loc)
+        ##防止自己的脚踩到自己的脚
+        leg_order = [0,1,2,5,4,3]
+        if i in range(6):
+            t1 = self.tips[i]
+            t2 = self.tips[(i+1)%6]
+            if(distance(t1.loc,t2.loc)<=0.02):
+                print("tip %d and %d are to close" %(i, (i+1)%6))
+                self.explode()
+            
+            
 class Goal(rep_obj):
     def __init__(self):
         self.loc = np.array([5,5,5])
@@ -286,37 +348,12 @@ class Cylinder(rep_obj):
 """
 Toy-rep environment
 """
-hexpod = Hexpod()
-goal = Goal()
-OBJS = [hexpod,goal]
+OBJS = [Hexpod(),Goal()]
 CLDS = []
 for i in range(0, 10):
     CLDS.append(Cylinder( 0.1 , 'Barrier' + str(i)))
 for i in range(0, 6):
     CLDS.append(Cylinder( 0.5 , 'Wall' + str(i)))
-
-
-class robot_client:
-    def __init__(self):
-        # self.s = pxssh.pxssh()
-        # hostname = "202.120.38.59"
-        # username = "hexpodmlc"
-        # password = "321hexpod"
-        # self.s.login(hostname, username, password)
-        # self.s.sendline('uptime')   # run a command
-        # self.s.prompt()             # match the prompt
-        pass
-# print(s.before.decode("utf8"))        # print everything before the prompt.
-    def command(self, command ,args):
-        # self.s.sendline(command + " ".join(args))
-        # time.sleep(0.1)
-        # self.s.prompt()
-        # res = self.s.before.decode("utf8")
-        # return res
-        pass
-        return "POSPOS 5e-01,3e-01 0e-01,6e-01 -5e-01,3e-01 5e-01,-3e-01 0e-01,-6e-01 -5e-01,-3e-01"
-
-robot  = robot_client()
 
 
 # def collision_check():
@@ -346,63 +383,53 @@ def listTOPO():
     for b in CLDS:
         print(b.loc)
 
-def parsePosition(res):
-    print(res)
-    lines = res.split("\n")
-    ans = np.zeros((3,2))
-    for i in range(1,len(lines)+1):
-        if("POSPOS" in lines[-i] ):
-            index = lines[-i].find("POSPOS")
-            lin = lines[-i][index+6:].strip()
-            pos = lin.split(" ")
-            for i,p in enumerate(pos):
-                ps = p.split(",")
-                # print("p:",p)
-                for j in range(2):
-                    # print(ps[j])
-                    hexpod.tips[i].p[j] = ps[j]
-                    ans[i][j] = float(ps[j])
-    return ans
+def drawTopo():
+    X = np.arange(WORLD_SIZE[0],WORLD_SIZE[1], 0.05)
+    Y = np.arange(WORLD_SIZE[0],WORLD_SIZE[1], 0.05)
+    X, Y = np.meshgrid(X, Y)
+    # for x in
+     
+    Z = np.zeros_like(X)
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            Z[i][j] = TOPO(X[i][j],Y[i][j])
+    ax.plot_surface(X, Y, Z, #c="peru", #cmap=cm.coolwarm,
+                       linewidth=0, antialiased=False,color = "peru")
 
-
-def updateRobotPosition():
-    #hexpod.ori ,loc call slam
-    with open("vec_rot.txt","r") as f:
-        line = f.readline()
-        nums = line.split(" ")
-        for i in range(2):
-            hexpod.loc[i] = float(nums[i])
-        hexpod.ori = float(nums[5])
-    # for t in hexpod.tips:
-    
-    res = robot.command("./rbt gf",[])
-    assert(res)
-    parsePosition(res)
-    
-    
 
 def simxSynchronousTrigger(ID): # 每一次只在Trigger的时候更新
-    pass
+    if(DISPLAY):
+        ax.clear()
 
+    for obj in OBJS:
+        obj.refresh()
+        obj.collision_check()
+        if(DISPLAY):
+            obj.draw(ax)
+    
+    if(DISPLAY):
+        # drawTopo()
+        ax.auto_scale_xyz(WORLD_SIZE,WORLD_SIZE,[0,2])
+        # ax.plot([0,1],[0,1],-0.5,"-r")
+        fig.canvas.draw()
 
 def simxGetObjectHandle(ID,name,opmod):
     return 1,NAME.get(name,-2)
 
-
 def simxGetObjectPosition(ID, obj, cdn, opmod):
 
     obj = HANDLE[obj]
-    updateRobotPosition()
+    if(not obj.state):
+        a = np.empty((3,))
+        a[:] = np.nan
+        return 1, a
+
     if(cdn==-1):
-        #CALL SLAM API
         return 1, obj.loc
     cdn = HANDLE[cdn]
     if(obj.parent==cdn):
-        # CALL ROBOT API
         return 1,obj.p
-    if(obj == goal):
-        return 1,turnVec(obj.loc-cdn.loc,-cdn.ori)
-        
+    return 1,turnVec(obj.loc-cdn.loc,-cdn.ori)
 
 def simxSetObjectPosition(ID,obj, cdn, pos ,opmod):
     obj = HANDLE[obj]
@@ -413,7 +440,6 @@ def simxSetObjectPosition(ID,obj, cdn, pos ,opmod):
         return 1
     cdn = HANDLE[cdn]
     if(obj.parent==cdn):
-        assert (len("WRONG CALL, SET TIPS POSITION")==0)
         obj.p = np.array(pos)
         return 1
     
@@ -421,17 +447,8 @@ def simxSetObjectPosition(ID,obj, cdn, pos ,opmod):
 def simxGetObjectOrientation(ID,obj, cdn ,opmod):
     assert (cdn==-1)
     obj = HANDLE[obj]
-    updateRobotPosition()
     return 1,np.array([0,0,obj.ori])
 
-def robotSetFoot(side, pee, peb):
-    command = "./rbt sf "
-    args = ["-i=%d" %side]
-    for i,a in enumerate(["-a","-d","-b","-e","-c","-f"]):
-        args.append(a+"="+str(pee[i]))
-    for i,a in enumerate(["-g","-j","-h","-k","-l","-m"]):
-        args.append(a+"="+str(peb[i]))
-    robot.command(command,args)
 
 # def drawPoint(loc):
     
@@ -440,7 +457,12 @@ def robotSetFoot(side, pee, peb):
 
 
 # fig,ax = plt.subplots(1,1,projection = "3d")
-
+if(DISPLAY):
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')
+    ax2 = fig.gca(projection = '3d')
+    ax.auto_scale_xyz(WORLD_SIZE,WORLD_SIZE,[0,5])
+# ax.autoscale(enable=False, axis='both', tight=None)
 plt.show(block=False)
 if __name__ == "__main__":
     n = 30

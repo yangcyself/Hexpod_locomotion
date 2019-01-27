@@ -139,8 +139,9 @@ def three_step_delta(newpos_delta,side):
     for i in range(6):
         if(i%2==side):
             target[i] += newpos_delta[int(i/2)]
-            pee.append(newpos_delta[int(i/2)][:2])
+            pee += list(newpos_delta[int(i/2)][:2])
     # # transTo(target)
+    print(pee)
     peb = list(avedelta)+[0,0,averageOri(target)]
     vrep.robotSetFoot(side,pee,peb)
 
