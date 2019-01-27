@@ -10,6 +10,7 @@ import numpy as np
 SIDE = 0
 PAIN_GAMMA = 1
 OBSERVETOPO = True
+BLUEROBOT = True
 
 ORIPOS=np.array([[ 5.27530670e-01 , 3.04633737e-01,-5.4652e-01],
         [-2.28881836e-05 , 6.09106421e-01,-5.4652e-01],
@@ -112,7 +113,8 @@ def reset():
     vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
     time.sleep(5)
     status = vrep.simxStartSimulation(clientID, vrep.simx_opmode_blocking)
-    recover(n=30)
+    if(not BLUEROBOT):
+        recover(n=30)
     # print("status",status)
 
     global target

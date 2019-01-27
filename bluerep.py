@@ -368,7 +368,7 @@ def updateRobotPosition():
         nums = line.split(" ")
         for i in range(2):
             hexpod.loc[i] = float(nums[i])
-        hexpod.ori[2] = float(nums[5])
+        hexpod.ori = float(nums[5])
     # for t in hexpod.tips:
     res = robot.command("./rbt gf",[])
     assert(res)
