@@ -1,3 +1,4 @@
+# -^- coding:utf-8 -^-
 from __future__ import division
 # import gym
 import numpy as np
@@ -35,7 +36,7 @@ print (' Action Max :- ', A_MAX)
 
 ram = buffer.MemoryBuffer(MAX_BUFFER)
 trainer = train.Trainer(S_DIM, A_DIM, A_MAX, ram)
-# RESUME = 1000
+# RESUME = 2700
 RESUME = 0
 if(RESUME):
     trainer.load_models(RESUME)

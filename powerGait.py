@@ -6,6 +6,7 @@ N=5
 import numpy as np
 import math
 import time
+import copy
 """
 可以调用的接口：three_step_delta(newpos_delta,side)
                 three_step(newpos,side)
@@ -46,6 +47,24 @@ def recover(n=N):
 #     time.sleep(2)
 #     status = vrep.simxStartSimulation(clientID, vrep.simx_opmode_blocking)
 #     recover()
+
+def ave_ang(angs):
+    angs = np.array(angs)
+    x = np.cos(angs)
+    y = np.sin(angs)
+    return math.atan2(np.sum(y),np.sum(x))
+def turnVec(vec,deg):
+    """
+    Get the vector after turned the vec some degree
+    """
+    assert(vec.shape==(3,))
+    return np.array([
+        vec[0]*np.cos(deg) - vec[1]*np.sin(deg),
+        vec[0]*np.sin(deg) + vec[1]*np.cos(deg),
+        vec[2]
+    ])
+
+
 
 def transTo(target,n=N): #TODO: make max step length or 
 
@@ -88,10 +107,19 @@ def detork(target):
     for i in range(0,6):
         dist[i] = math.sqrt(target[i][0]**2+target[i][1]**2)
         ang[i] = math.atan2(target[i][1],target[i][0])
+    # print(ang)
+    # print(np.sum(ang)/6,-ave_ang(ang))
     ang-=np.sum(ang)/6
+    # deg = -ave_ang(ang)
+    # target_ = copy.deepcopy(target)
     for i in range(6):        
         target[i][0] = dist[i]*math.cos(ang[i])
         target[i][1] = dist[i]*math.sin(ang[i])
+        # print("target_")
+        # print(target_[i])
+        # target[i] = turnVec(target[i],deg)
+        # print("target")
+        # print(target[i])
     return target
 
 def three_step_delta(newpos_delta,side):
