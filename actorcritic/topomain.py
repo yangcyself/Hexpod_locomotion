@@ -13,14 +13,14 @@ import buffer
 # import sys
 # sys.path.append("../")
 import toyenv as env
+from config import*
 
 
 MAX_EPISODES = 5000
 MAX_STEPS = 100
 MAX_BUFFER = 1000000
 MAX_TOTAL_REWARD = 300
-RESUME = 5300
-RESUME = 0
+
 
 # S_DIM = env.observation_space.shape[0]
 # A_DIM = env.action_space.shape[0]

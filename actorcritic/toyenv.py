@@ -1,16 +1,18 @@
 # -^- coding:utf-8 -^-
 import sys
 sys.path.append("../")
-
-from powerGait import *
-# from blueGait import *
+from config import *
+if (ENVIRONMENT=="BLUE"):
+    from blueGait import *
+else:
+    from powerGait import *
 import time
 import numpy as np
 
+
 SIDE = 0
 PAIN_GAMMA = 1
-OBSERVETOPO = True
-BLUEROBOT = True
+
 
 ORIPOS=np.array([[ 5.27530670e-01 , 3.04633737e-01,-5.4652e-01],
         [-2.28881836e-05 , 6.09106421e-01,-5.4652e-01],
@@ -25,7 +27,7 @@ topolist = []
 def generateTarget():
     loc = np.random.rand(2)
     loc = (loc-0.5)*10
-    loc = np.append(loc ,[0.67])
+    loc = np.append(loc ,[0.2])
     loc = list(loc)
     # loc = np.array([5,0,0.67])
     return loc

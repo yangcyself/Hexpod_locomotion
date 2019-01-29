@@ -1,8 +1,11 @@
 # -^- coding:utf-8 -^-
-# import vrep
-# N = 50
-import toyrep as vrep
-N=5
+from actorcritic.config import *
+if ENVIRONMENT=="VREP":
+    import vrep
+    N = 50
+else:
+    import toyrep as vrep
+    N=5
 import numpy as np
 import math
 import time

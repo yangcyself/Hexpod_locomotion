@@ -25,6 +25,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import math
 import numpy as np
 import time
+from actorcritic.config import *
+
 
 WORLD_SIZE = [-5,5]
 
@@ -33,10 +35,7 @@ HANDLE = {}# handle -> obj
 H_count = 0
 
 #whether make sure that the body position is near the middle of the fixed legs
-STRICT_BALANCE = True 
-TIPS_order = False
-TIPS_distance = True
-DISPLAY = False
+
 
 # DISPLAY = True
 
