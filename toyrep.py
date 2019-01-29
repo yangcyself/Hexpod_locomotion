@@ -4,6 +4,20 @@
 import toyrep as vrep
 N=5
 别的不变
+
+说明
+该文件主要由两部分构成，一部分是针对六足机器人的定义以及模型中一些物体的定义，一部分是针对vrep的API函数
+
+文件执行过程：
+import时初始化
+调用了setobjectPosition类似的东西时会保存一个相对参考系的值（比如腿相对身体的值），后面再一并更新
+会在simxSynchronousTrigger 被调用的时候更新所有物体的状态，以及检查碰撞（现在的逻辑是碰到了就爆炸），还有可视化
+
+定义部分：
+基类：rep_obj， 负责管理handle，name，parent等等信息
+每个类都要有     refresh     draw     collision_check     reset这几个函数，
+
+
 """
 
 import matplotlib.pyplot as plt
@@ -119,6 +133,7 @@ class Hexpod(rep_obj):
             super(Hexpod, self).__init__("BCS",None)
             self.tips=[]
         self.state = True
+
         tip_start_loc = [[ 5.27530670e-01 , 3.04633737e-01 ,-height],
                             [-2.28881836e-05 , 6.09106421e-01 ,-height],
                             [-5.27527809e-01 , 3.04500699e-01 ,-height],
@@ -181,6 +196,9 @@ class Hexpod(rep_obj):
         self.__init__(reset=True)
 
     def toGlob(self,vec):
+        """
+        相对身体坐标系转世界坐标系
+        """
         return turnVec(vec,self.ori)
 
     def explode(self):
@@ -238,6 +256,12 @@ class Hexpod(rep_obj):
         print("self.loc",self.loc,"self.ori",self.ori)
 
     def refresh(self):
+        """
+        refresh 的过程，先确定身高（这时假设身体的欧拉角永远前两个数是0）
+        再确定踩在地上的脚
+        再确定身体坐标
+        再推出其他坐标
+        """
         #solve the position of body
 
         # refresh the height

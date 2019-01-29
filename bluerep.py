@@ -349,7 +349,7 @@ def listTOPO():
 def parsePosition(res):
     print(res)
     lines = res.split("\n")
-    ans = np.zeros((3,2))
+    ans = np.zeros((6,2))
     for i in range(1,len(lines)+1):
         if("POSPOS" in lines[-i] ):
             index = lines[-i].find("POSPOS")
