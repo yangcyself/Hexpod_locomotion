@@ -2,8 +2,8 @@
 import sys
 sys.path.append("../")
 
-# from powerGait import *
-from blueGait import *
+from powerGait import *
+# from blueGait import *
 import time
 import numpy as np
 

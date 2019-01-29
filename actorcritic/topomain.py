@@ -7,7 +7,7 @@ from torch.autograd import Variable
 import os
 # import psutil
 import gc
-
+from logger import Logger
 import train
 import buffer
 # import sys
@@ -19,6 +19,8 @@ MAX_EPISODES = 5000
 MAX_STEPS = 100
 MAX_BUFFER = 1000000
 MAX_TOTAL_REWARD = 300
+RESUME = 5300
+RESUME = 0
 
 # S_DIM = env.observation_space.shape[0]
 # A_DIM = env.action_space.shape[0]
@@ -36,17 +38,21 @@ print (' Action Max :- ', A_MAX)
 
 ram = buffer.MemoryBuffer(MAX_BUFFER)
 trainer = train.Trainer(S_DIM, A_DIM, A_MAX, ram)
-# RESUME = 2700
-RESUME = 0
+logger = Logger("./logs")
+logRate = 100
 if(RESUME):
     trainer.load_models(RESUME)
+
+
 def main():
     total_reward = 0
-    for _ep in range(MAX_EPISODES):
+    averagetotoal_reward = 0
+    for _ep in range(1,MAX_EPISODES):
         (obs,tpo) = env.reset()
         observation = obs+list(tpo.reshape(-1,))
         _ep = _ep+RESUME
         print("last total reward:", total_reward)
+        averagetotoal_reward += total_reward
         total_reward = 0
         print ('EPISODE :- ', _ep)
         for r in range(MAX_STEPS):
@@ -77,8 +83,15 @@ def main():
         # check memory consumption and clear memory
         gc.collect()
 
-        if _ep%100 == 0:
+        if _ep%logRate == 0:
             trainer.save_models(_ep)
+
+            info = { 'averageTotalReward': averagetotoal_reward/logRate}
+
+            for tag, value in info.items():
+                logger.scalar_summary(tag, value, _ep)
+
+            averagetotoal_reward = 0
 
     print ('Completed episodes')
 

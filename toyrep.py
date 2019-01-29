@@ -34,8 +34,10 @@ H_count = 0
 
 #whether make sure that the body position is near the middle of the fixed legs
 STRICT_BALANCE = True 
-TIPS_order = True
+TIPS_order = False
+TIPS_distance = True
 DISPLAY = False
+
 # DISPLAY = True
 
 
@@ -378,6 +380,17 @@ class Hexpod(rep_obj):
                     print("CHECK FOOT ORDER",i)
                     self.printState()
                     self.explode()
+        if(TIPS_distance):
+            #相邻脚之间的角度差应该足够大
+            orders = [0,1,2,5,4,3,0]
+            for i in range(6):
+                if(not (0.1 < (math.atan2(self.tips[orders[i+1]].p[1],self.tips[orders[i+1]].p[0]) 
+                    - math.atan2(self.tips[orders[i]].p[1],self.tips[orders[i]].p[0]))%(math.pi*2) < 2)):
+                    print("CHECK FOOT DIStANCE ",i)
+                    self.printState()
+                    self.explode()
+                    break
+
 class Goal(rep_obj):
     def __init__(self):
         self.loc = np.array([5,5,5])
