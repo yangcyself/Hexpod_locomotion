@@ -5,7 +5,7 @@ ENVIRONMENT = "TOY"
 # ENVIRONMENT = "VREP"
 
 COMMENT="TEST"
-
+FILEOUT = False
 
 #Configues for topomain
 RESUME = 2900

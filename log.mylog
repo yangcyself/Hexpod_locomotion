@@ -1,0 +1,16 @@
+现在到了toyrep调参 vrep验证阶段
+如果没有footorder，腿交叉的现象比较严重，应该加上
+
+加了footorder训了5300轮，机器人出现撞到障碍的现象
+    换做footdistance，正在训练
+观察到的机器人疯狂旋转可能是因为 detorch的时候角度求解有误所致
+    已修正
+
+改成一个通过reward 软调整policy的体系
+
+
+
+EXPERIMENTS：
+    无footorder，有footdistance，有pain， 2900轮，
+    出现了远离目标的现象
+    仍有腿的角度很近的现象

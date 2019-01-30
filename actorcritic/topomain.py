@@ -96,7 +96,13 @@ def main():
     print ('Completed episodes')
 
 if __name__ == "__main__":
-    main()
+    if FILEOUT:
+        with open('./pod_out.txt', 'w+', 1) as redirect_out:
+            sys.stdout = redirect_out
+            main()
+    else:
+        main()
+    # main()
     # env.recover( n=30)
     # env.walk_a_step(0.3,1.57)
     # env.turn_a_deg(0.5)
