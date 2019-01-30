@@ -7,7 +7,7 @@ from torch.autograd import Variable
 import os
 # import psutil
 import gc
-from logger import Logger
+from logger import Logger,Tlogger
 import train
 import buffer
 # import sys
@@ -82,7 +82,7 @@ def main():
 
         # check memory consumption and clear memory
         gc.collect()
-
+        Tlogger.refresh()
         if _ep%logRate == 0:
             trainer.save_models(_ep)
 

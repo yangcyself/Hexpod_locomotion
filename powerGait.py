@@ -105,22 +105,27 @@ def detork(target):
     """
     make the position have no zhuan dong
     """
-    dist = np.zeros(6)
+    # dist = np.zeros(6)
     ang = np.zeros(6)
+    basAng = [1,3,5,-1,-3,-5]
+    basAng = np.array(basAng)*math.pi/6
     for i in range(0,6):
-        dist[i] = math.sqrt(target[i][0]**2+target[i][1]**2)
+        # dist[i] = math.sqrt(target[i][0]**2+target[i][1]**2)
         ang[i] = math.atan2(target[i][1],target[i][0])
+        
     # print(ang)
     # print(np.sum(ang)/6,-ave_ang(ang))
-    ang-=np.sum(ang)/6
+    # ang-=np.sum(ang)/6
+    deg = ave_ang(ang-basAng)
+    # ang -= deg
     # deg = -ave_ang(ang)
     # target_ = copy.deepcopy(target)
     for i in range(6):        
-        target[i][0] = dist[i]*math.cos(ang[i])
-        target[i][1] = dist[i]*math.sin(ang[i])
+        # target[i][0] = dist[i]*math.cos(ang[i])
+        # target[i][1] = dist[i]*math.sin(ang[i])
         # print("target_")
         # print(target_[i])
-        # target[i] = turnVec(target[i],deg)
+        target[i] = turnVec(target[i],-deg)
         # print("target")
         # print(target[i])
     return target

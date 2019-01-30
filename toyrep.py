@@ -26,6 +26,7 @@ import math
 import numpy as np
 import time
 from actorcritic.config import *
+from actorcritic.logger import Tlogger
 
 
 WORLD_SIZE = [-5,5]
@@ -33,7 +34,7 @@ WORLD_SIZE = [-5,5]
 NAME = {} # name -> handle
 HANDLE = {}# handle -> obj
 H_count = 0
-
+tlogger = Tlogger
 #whether make sure that the body position is near the middle of the fixed legs
 
 
@@ -354,6 +355,7 @@ class Hexpod(rep_obj):
             if(distance(t1.loc,t2.loc)<=0.02):
                 print("tip %d and %d are to close" %(i, (i+1)%6))
                 self.explode()
+                tlogger.dist["foot_distance"] = tlogger.dist.get("foot_distance",0)+1
         #防止失去平衡
         if(STRICT_BALANCE):
             #assume that only one set of three legs is fixed, as the ave of all six is 0
@@ -368,17 +370,22 @@ class Hexpod(rep_obj):
                 print("CHECK BODY LOSE BALANCE")
                 self.printState()
                 self.explode()
+                tlogger.dist["BALANCE"] = tlogger.dist.get("BALANCE",0)+1
         if(TIPS_order):
             for i in range(0,3):
                 if(not i*math.pi/3 < math.atan2(self.tips[i].p[1],self.tips[i].p[0]) < (i+1)*math.pi/3):
                     print("CHECK FOOT ORDER",i)
                     self.printState()
                     self.explode()
+                    break
+                    tlogger.dist["foot_order"] = tlogger.dist.get("foot_order",0)+1
             for i in range(3,6):
                 if(not (3-i)*math.pi/3 > math.atan2(self.tips[i].p[1],self.tips[i].p[0]) > (2-i)*math.pi/3):
                     print("CHECK FOOT ORDER",i)
                     self.printState()
                     self.explode()
+                    tlogger.dist["foot_order"] = tlogger.dist.get("foot_order",0)+1
+                    break
         if(TIPS_distance):
             #相邻脚之间的角度差应该足够大
             orders = [0,1,2,5,4,3,0]
@@ -386,6 +393,7 @@ class Hexpod(rep_obj):
                 if(not (0.1 < (math.atan2(self.tips[orders[i+1]].p[1],self.tips[orders[i+1]].p[0]) 
                     - math.atan2(self.tips[orders[i]].p[1],self.tips[orders[i]].p[0]))%(math.pi*2) < 2)):
                     print("CHECK FOOT DIStANCE ",i)
+                    tlogger.dist["foot_ang_distance"] = tlogger.dist.get("foot_ang_distance",0)+1
                     self.printState()
                     self.explode()
                     break

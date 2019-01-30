@@ -8,7 +8,8 @@ else:
     from powerGait import *
 import time
 import numpy as np
-
+from logger import Tlogger
+tlogger = Tlogger
 
 SIDE = 0
 PAIN_GAMMA = 1
@@ -162,6 +163,18 @@ def exit():
     vrep.simxFinish(clientID)
     vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
 
+rewardItems = []
+def legPainful(obs):
+    rwd = 0
+    for i in range(6):
+        pain  = obs[2*i+0]**2+obs[2*i+1]**2 - 0.5
+        if(pain>0):
+            rwd -= pain
+    return rwd
+rewardItems.append((legPainful,RWD_PAIN,RWDFAC_PAIN,"pain"))
+
+
+
 def step(action):
 
     global lastdist
@@ -185,13 +198,8 @@ def step(action):
     SIDE = 1-SIDE
     obs = []
     for i in range(6):
-        res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)
-        #painful
-        pain  = loc[0]**2+loc[1]**2 - 0.5
-        if(pain>0):
-            reward -= pain
+        res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)       
         loc = list(loc[:-1])
-        
         obs+=loc
     res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
     if(loc[2]<0.05 or np.isnan(loc[2]) or abs(loc[2])>1e+10):
@@ -226,6 +234,13 @@ def step(action):
     if(dst > 15):
         reward -= 20
         done = True
+    
+    
+    for item, flag,fac,nam in rewardItems:
+        if(flag):
+            r  = fac * item(obs)
+            reward += r
+            tlogger.dist[nam] = tlogger.dist.get(nam,0)+r
     # print(reward)
 
     info = None
