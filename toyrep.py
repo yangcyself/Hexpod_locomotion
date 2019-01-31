@@ -445,7 +445,7 @@ Toy-rep environment
 """
 OBJS = [Hexpod(),Goal()]
 CLDS = []
-for i in range(0, 10):
+for i in range(0, 12):
     CLDS.append(Cylinder( 0.1 , 'Barrier' + str(i)))
 for i in range(0, 6):
     CLDS.append(Cylinder( 0.5 , 'Wall' + str(i)))
