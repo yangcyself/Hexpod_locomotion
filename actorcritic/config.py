@@ -8,7 +8,10 @@ COMMENT="TEST"
 FILEOUT = False
 FILEOUT = FILEOUT and ENVIRONMENT=="TOY"
 
-REFRESHTOPO = True
+REFRESHTOPO = False
+FUTHERTOPO = True
+
+
 
 #Configues for topomain
 RESUME = 0

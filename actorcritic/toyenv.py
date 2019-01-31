@@ -89,8 +89,6 @@ def topoObservation():
 
     resolution = 0.05
     scale = 1 #40*40  比 cifar10 还大
-    points = scale*2/resolution
-    topomap = np.array((points,points))
     X = np.arange(-scale,scale,resolution)
     Y = np.arange(-scale,scale,resolution)
     X, Y = np.meshgrid(X, Y)
@@ -109,6 +107,33 @@ def topoObservation():
             Z[i][j] = topograph(gX[i][j],gY[i][j])
     return Z
 
+
+def futherTopoObservation():
+    if(REFRESHTOPO):
+        refresh_TOPO()
+
+    resolution = 0.4
+    scale = 2.4 #40*40  比 cifar10 还大
+    X = np.arange(-scale,scale+resolution,resolution)
+    Y = np.arange(-scale,scale+resolution,resolution)
+    X, Y = np.meshgrid(X, Y)
+    res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    location = loc[:2]
+    res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    ori = loc[2]
+    #turn_neg_ori
+    gX = X*np.cos(-ori) - Y*np.sin(-ori)
+    gY = X*np.sin(-ori) + Y*np.cos(-ori)
+    gX += location[0]
+    gY += location[1]
+    Z = []
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            if( 4<=i<9 and 4<=j<9):
+               continue
+            Z.append(topograph(gX[i][j],gY[i][j]))
+
+    return list(np.array(Z).reshape(-1,))
 
 def distance(obs):
     dst = 0
@@ -158,7 +183,9 @@ def reset():
 
     obs.append(SIDE)
     assert(len(obs)==15)
-
+    if (FUTHERTOPO):
+        obs+=futherTopoObservation()
+        
     if(OBSERVETOPO):
         return (obs,topoObservation())
 
@@ -253,6 +280,10 @@ def step(action):
     # print(reward)
 
     info = None
+
+    if (FUTHERTOPO):
+        obs+=futherTopoObservation()
+
     if(OBSERVETOPO):
         return (obs,topoObservation()) ,reward, done, info
     return obs ,reward, done, info

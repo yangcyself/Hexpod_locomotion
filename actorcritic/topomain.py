@@ -28,6 +28,8 @@ MAX_TOTAL_REWARD = 300
 # A_MAX = env.action_space.high[0]
 
 S_DIM = 1615 #1600 + 160 + 15
+if(FUTHERTOPO):
+    S_DIM += 144
 A_DIM = 6
 # A_MAX = 0.3
 A_MAX = 0.25
