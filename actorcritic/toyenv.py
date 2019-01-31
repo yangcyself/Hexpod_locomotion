@@ -184,6 +184,8 @@ def dangerous(obs):
     rwd = 0
     X,Y = obs[12],obs[13]
     for x,y,r,h in topolist:
+        if(h<0.3):
+            continue
         danger = min(0,math.sqrt((x-X)**2+(y-Y)**2)-threshold)
         rwd -= danger**2
     return rwd
@@ -221,13 +223,7 @@ def step(action):
         reward =-20
         print("@@@@@@ E X P L O D E @@@@@@")
         done = True
-    # print(loc, end = " ")
-    # loc = list(loc)
-    # obs+=loc
-    # res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
-    # loc = list(loc)
-    # obs+=loc
-    
+   
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
     obs+=list(difftarget)
     # print(difftarget,end = " ")

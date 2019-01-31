@@ -18,7 +18,7 @@ from config import*
 
 
 MAX_EPISODES = 5000
-MAX_STEPS = 100
+MAX_STEPS = 200
 MAX_BUFFER = 1000000
 MAX_TOTAL_REWARD = 300
 
@@ -88,8 +88,8 @@ def main():
 
         # check memory consumption and clear memory
         gc.collect()
-        Tlogger.refresh()
         if _ep%logRate == 0:
+            Tlogger.refresh()
             trainer.save_models(_ep)
 
             info = { 'averageTotalReward': averagetotoal_reward/logRate}

@@ -266,8 +266,8 @@ if clientID!=-1:
     for i in range(1, 19):
         res, pole[i] = vrep.simxGetObjectHandle(clientID, 'P' + str(i), vrep.simx_opmode_blocking)
 
-    Barrier = np.zeros(10, dtype='int32')
-    for i in range(0, 10):
+    Barrier = np.zeros(12, dtype='int32')
+    for i in range(0, 12):
         res, Barrier[i] = vrep.simxGetObjectHandle(clientID, 'Barrier' + str(i), vrep.simx_opmode_blocking)
 
     Wall = np.zeros(6, dtype='int32')
