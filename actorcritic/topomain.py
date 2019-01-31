@@ -27,7 +27,7 @@ MAX_TOTAL_REWARD = 300
 # A_DIM = env.action_space.shape[0]
 # A_MAX = env.action_space.high[0]
 
-S_DIM = 1616
+S_DIM = 1616 #1600 + 160 + 15
 A_DIM = 6
 # A_MAX = 0.3
 A_MAX = 0.25

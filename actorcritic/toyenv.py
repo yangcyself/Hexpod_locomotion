@@ -117,6 +117,17 @@ def distance(obs):
         dst += obs[i+12]**2
     return math.sqrt(dst)
 
+lastPos = np.array([0]*2)
+
+def rewardFunc(difftarget):
+    global lastPos 
+    standardStep = 0.25
+    lastdist = math.sqrt(np.sum(lastPos**2))
+    tmp = lastPos
+    lastPos = difftarget
+    return math.exp(-10*(min(0, tmp.dot(tmp-difftarget)/lastdist - standardStep)**2)) #不动的时候0.5reward， 正确的方向时1
+
+
 def reset():
     vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
     time.sleep(5)
@@ -124,11 +135,8 @@ def reset():
     if(not BLUEROBOT):
         recover(n=30)
     # print("status",status)
-
+    global lastPos
     global target
-    global lastdist
-    global bestdist
-
     generate_set_TOPO()
 
     target = generateTarget()
@@ -144,20 +152,12 @@ def reset():
         res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)
         loc = list(loc[:-1])
         obs+=loc
-    # res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
-    # loc = list(loc)
-    # obs+=loc
-    # res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
-    # loc = list(loc)
-    # obs+=loc
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    
-    obs+=list(difftarget)
+    lastPos = np.array(difftarget[:-1])
+    obs+=list(difftarget[:-1])
+
     obs.append(SIDE)
-    dst = distance(obs)
-    lastdist = dst
-    bestdist = dst
-    assert(len(obs)==16)
+    assert(len(obs)==15)
 
     if(OBSERVETOPO):
         return (obs,topoObservation())
@@ -194,14 +194,11 @@ rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
 
 def step(action):
 
-    global lastdist
-    global bestdist
     global SIDE
-
+   
     # global dist_ckp
     reward = 0
     done = False
-    assert (lastdist>0)
     assert (len(action) ==6)
     
     oriPos = ORIPOS[[a for a in range(SIDE,6,2)]]
@@ -220,33 +217,34 @@ def step(action):
         obs+=loc
     res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
     if(loc[2]<0.05 or np.isnan(loc[2]) or abs(loc[2])>1e+10):
-        reward =-20
+        reward =-1
         print("@@@@@@ E X P L O D E @@@@@@")
         done = True
    
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    obs+=list(difftarget)
+    obs+=list(difftarget[:-1])
     # print(difftarget,end = " ")
 
     obs.append(SIDE)
-    assert(len(obs)==16)
+    assert(len(obs)==15)
     dst = distance(obs)
-    # print(dst , bestdist)
-    # print("orientation:", obs[-5])
-    if(bestdist > dst and not done):
-        reward += 2*(bestdist - dst)
-        bestdist = dst
-    if(not done):
-        reward += min(0,lastdist -  dst)
-    lastdist = dst
+
     if(dst < 0.5):
-        reward  =20
-        done = True
+        global target
+        target = generateTarget()
+        while(target[0]**2+target[1]**2<4 or topograph(target[0],target[1])!=0):
+            target = generateTarget()
+
+        target = list(target)
+        vrep.simxSetObjectPosition(clientID, goal, -1, target,
+                                vrep.simx_opmode_oneshot_wait)
+
     if(dst > 15):
-        reward -= 20
+        reward -= 1
         done = True
-    
-    
+    if(not done):
+        reward += rewardFunc(np.array(difftarget[:-1]))
+
     for item, flag,fac,nam in rewardItems:
         if(flag):
             r  = fac * item(obs)
@@ -264,8 +262,6 @@ running  = False
 target = generateTarget()
 while(target[0]**2+target[1]**2<4):
     target = generateTarget()
-lastdist = -1
-bestdist = -1
 
 def mystep(act):
     # act = act.reshape(3,2)
