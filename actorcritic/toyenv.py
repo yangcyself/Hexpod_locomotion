@@ -10,6 +10,7 @@ import time
 import numpy as np
 from logger import Tlogger
 tlogger = Tlogger
+print(tlogger)
 
 SIDE = 0
 PAIN_GAMMA = 1
@@ -82,6 +83,10 @@ def generate_set_TOPO():
 
 
 def topoObservation():
+
+    if(REFRESHTOPO):
+        refresh_TOPO()
+
     resolution = 0.05
     scale = 1 #40*40  比 cifar10 还大
     points = scale*2/resolution
@@ -173,6 +178,16 @@ def legPainful(obs):
     return rwd
 rewardItems.append((legPainful,RWD_PAIN,RWDFAC_PAIN,"pain"))
 
+
+def dangerous(obs):
+    threshold = 0.6
+    rwd = 0
+    X,Y = obs[12],obs[13]
+    for x,y,r,h in topolist:
+        danger = min(0,math.sqrt((x-X)**2+(y-Y)**2)-threshold)
+        rwd -= danger**2
+    return rwd
+rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
 
 
 def step(action):

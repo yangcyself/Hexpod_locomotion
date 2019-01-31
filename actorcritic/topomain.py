@@ -60,7 +60,10 @@ def main():
 
             state = np.float32(observation)
 
-            action = trainer.get_exploration_action(state)
+            if(TESTBEHAVE):
+                action = trainer.get_exploitation_action(state)    
+            else:
+                action = trainer.get_exploration_action(state)
 
             # new_observation, reward, done, info = env.step(action)
             (obs,tpo), reward, done, info = env.step(action)
@@ -72,12 +75,14 @@ def main():
             else:
                 new_state = np.float32(new_observation) 
                 # print("HERE",state, action, reward, new_state)
-                ram.add(state, action, reward, new_state)
+                if(not TESTBEHAVE):
+                    ram.add(state, action, reward, new_state)
 
             observation = new_observation
 
             # perform optimization
-            trainer.optimize()
+            if(not TESTBEHAVE):
+                trainer.optimize()
             if done:
                 break
 
