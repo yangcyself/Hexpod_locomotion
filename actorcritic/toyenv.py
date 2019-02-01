@@ -250,7 +250,7 @@ def step(action):
    
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
     obs+=list(difftarget[:-1])
-    # print(difftarget,end = " ")
+    print(difftarget,end = " ")
 
     obs.append(SIDE)
     assert(len(obs)==15)
@@ -270,14 +270,17 @@ def step(action):
         reward -= 1
         done = True
     if(not done):
-        reward += rewardFunc(np.array(difftarget[:-1]))
-
+        r = rewardFunc(np.array(difftarget[:-1]))
+        tlogger.dist["rewardFunc"] = tlogger.dist.get("rewardFunc",0)+r
+        reward +=r
     for item, flag,fac,nam in rewardItems:
         if(flag):
             r  = fac * item(obs)
             reward += r
             tlogger.dist[nam] = tlogger.dist.get(nam,0)+r
+            print(nam, r, end = "\t")
     # print(reward)
+    print(reward)
 
     info = None
 
