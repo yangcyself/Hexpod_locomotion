@@ -288,8 +288,10 @@ class Hexpod(rep_obj):
         if(len(self.loc_sol)==0):
             print("ERROR, self.loc_sol empty \n DATAS: \n")
             self.printState()
-            #set loc accoring to least leg
-            self.loc_sol.append(tmin_t.loc - tmin_t.p)
+            # #set loc accoring to least leg
+            # self.loc_sol.append(tmin_t.loc - tmin_t.p)
+            self.explode()
+            return
 
         self.loc[2] = np.max(np.array(self.loc_sol),axis=0)[2]
         for t in self.tips:
