@@ -11,14 +11,16 @@ import gc
 from logger import Logger,Tlogger
 import train
 import buffer
+from os import listdir
+import string
 # import sys
 # sys.path.append("../")
 import toyenv as env
 from config import*
 
 
-MAX_EPISODES = 5000
-MAX_STEPS = 200
+MAX_EPISODES = 50000
+MAX_STEPS = 100
 MAX_BUFFER = 100000
 MAX_TOTAL_REWARD = 300
 
@@ -43,11 +45,11 @@ ram = buffer.MemoryBuffer(MAX_BUFFER)
 trainer = train.Trainer(S_DIM, A_DIM, A_MAX, ram)
 logger = Logger("./logs")
 logRate = 100
-if(RESUME):
-    trainer.load_models(RESUME)
 
 
 def main():
+    if(RESUME):
+        trainer.load_models(RESUME)
     total_reward = 0
     averagetotoal_reward = 0
     for _ep in range(1,MAX_EPISODES):
@@ -103,7 +105,22 @@ def main():
 
     print ('Completed episodes')
 
+def getnumber(name):
+    i = 0
+    while( name[i]in string.digits):
+        i+=1
+    if(not i):
+        return 0
+    return int(name[:i])
+
 if __name__ == "__main__":
+    if(len(sys.argv)==2): #The second argument is RESUME
+        RESUME = int(sys.argv[1])
+        if(RESUME==-1):
+            # print([ getnumber(f) for f in listdir("./Models")])
+            RESUME = max([ getnumber(f) for f in listdir("./Models")])
+
+    print (RESUME)
     if FILEOUT:
         with open('./pod_out.txt', 'w+', 1) as redirect_out:
             sys.stdout = redirect_out
