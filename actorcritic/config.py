@@ -4,7 +4,7 @@ ENVIRONMENT = "TOY"
 # ENVIRONMENT = "BLUE"
 # ENVIRONMENT = "VREP"
 
-COMMENT="TEST"
+COMMENT="CRAZY"
 FILEOUT = False
 FILEOUT = FILEOUT and ENVIRONMENT=="TOY"
 
@@ -17,8 +17,9 @@ FUTHERTOPO = True
 RESUME = 0
 LOGGING = False
 OBSERVETOPO = True
-TESTBEHAVE = True
+TESTBEHAVE = False
 
+SETTEDTOPO = True
 
 #Configurations in toyrep
 STRICT_BALANCE = True 
@@ -30,7 +31,7 @@ BLUEROBOT = ENVIRONMENT=="BLUE"
 
 #Reward Options:
 RWD_PAIN = True
-RWD_DANEROUS = True
+RWD_DANEROUS = False
 
 
 #Reward factors:

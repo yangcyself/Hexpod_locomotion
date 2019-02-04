@@ -162,14 +162,17 @@ def reset():
     # print("status",status)
     global lastPos
     global target
-    generate_set_TOPO()
+    if(SETTEDTOPO):
+        refresh_TOPO()
+    else:
+        generate_set_TOPO()
 
-    target = generateTarget()
-    while(target[0]**2+target[1]**2<4):
         target = generateTarget()
+        while(target[0]**2+target[1]**2<4):
+            target = generateTarget()
 
-    target = list(target)
-    vrep.simxSetObjectPosition(clientID, goal, -1, target,
+        target = list(target)
+        vrep.simxSetObjectPosition(clientID, goal, -1, target,
                                vrep.simx_opmode_oneshot_wait)
 
     obs = []
@@ -256,15 +259,6 @@ def step(action):
     assert(len(obs)==15)
     dst = distance(obs)
 
-    if(dst < 0.5):
-        global target
-        target = generateTarget()
-        while(target[0]**2+target[1]**2<4 or topograph(target[0],target[1])!=0):
-            target = generateTarget()
-
-        target = list(target)
-        vrep.simxSetObjectPosition(clientID, goal, -1, target,
-                                vrep.simx_opmode_oneshot_wait)
 
     if(dst > 15):
         reward -= 1
@@ -281,6 +275,15 @@ def step(action):
             print(nam, r, end = "\t")
     # print(reward)
     print(reward)
+    if(dst < 0.5):
+        global target
+        target = generateTarget()
+        while(target[0]**2+target[1]**2<4 or topograph(target[0],target[1])!=0):
+            target = generateTarget()
+
+        target = list(target)
+        vrep.simxSetObjectPosition(clientID, goal, -1, target,
+                                vrep.simx_opmode_oneshot_wait)
 
     info = None
 
