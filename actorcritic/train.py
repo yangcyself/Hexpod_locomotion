@@ -12,7 +12,7 @@ import utils
 import topoModel as model
 
 BATCH_SIZE = 128
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.0001
 GAMMA = 0.99
 TAU = 0.001
 USEGPU =  torch.cuda.is_available()
@@ -40,7 +40,7 @@ class Trainer:
 
 		self.critic = model.Critic(self.state_dim, self.action_dim)
 		self.target_critic = model.Critic(self.state_dim, self.action_dim)
-		self.critic_optimizer = torch.optim.Adam(self.critic.parameters(),LEARNING_RATE*5)
+		self.critic_optimizer = torch.optim.Adam(self.critic.parameters(),LEARNING_RATE*10)
 
 		if(USEGPU):
 			self.target_actor = self.target_actor.cuda()
