@@ -1,8 +1,8 @@
 # -^- coding: utf8 -^- 
 
-ENVIRONMENT = "TOY"
+# ENVIRONMENT = "TOY"
 # ENVIRONMENT = "BLUE"
-# ENVIRONMENT = "VREP"
+ENVIRONMENT = "VREP"
 
 COMMENT="CRAZY"
 FILEOUT = False
@@ -10,16 +10,18 @@ FILEOUT = FILEOUT and ENVIRONMENT=="TOY"
 
 REFRESHTOPO = False
 FUTHERTOPO = True
-
+SETTEDTOPO = True
+# MAP = "fence"
+MAP = None
+NOISE = False
 
 
 #Configues for topomain
-RESUME = 0
+RESUME = 10500
 LOGGING = False
 OBSERVETOPO = True
-TESTBEHAVE = False
+TESTBEHAVE = True
 
-SETTEDTOPO = True
 
 #Configurations in toyrep
 STRICT_BALANCE = True 
@@ -35,5 +37,5 @@ RWD_DANEROUS = False
 
 
 #Reward factors:
-RWDFAC_PAIN = 1
+RWDFAC_PAIN = 0.01
 RWDFAC_DANEROUS = 1

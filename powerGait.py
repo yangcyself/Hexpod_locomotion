@@ -274,6 +274,11 @@ if clientID!=-1:
     for i in range(0, 6):
         res, Wall[i] = vrep.simxGetObjectHandle(clientID, 'Wall' + str(i), vrep.simx_opmode_blocking)
 
+    Fence = np.zeros(2, dtype='int32')
+    for i in range(0, 2):
+        res, Fence[i] = vrep.simxGetObjectHandle(clientID, 'Fence' + str(i), vrep.simx_opmode_blocking)
+
+
     #Retrive the U1
     # 在腿和主题连接处。？？？
     U1 = np.zeros(6, dtype='int32')

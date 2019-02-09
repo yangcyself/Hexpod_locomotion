@@ -15,13 +15,14 @@ from os import listdir
 import string
 # import sys
 # sys.path.append("../")
-import toyenv as env
+# import toyenv as env
+import oldenv as env
 from config import*
 
 
 MAX_EPISODES = 50000
 MAX_STEPS = 100
-MAX_BUFFER = 100000
+MAX_BUFFER = 10000
 MAX_TOTAL_REWARD = 300
 
 
@@ -29,7 +30,7 @@ MAX_TOTAL_REWARD = 300
 # A_DIM = env.action_space.shape[0]
 # A_MAX = env.action_space.high[0]
 
-S_DIM = 1615 #1600 + 160 + 15
+S_DIM = 1616 #1600 + 160 + 15
 if(FUTHERTOPO):
     S_DIM += 144
 A_DIM = 6
@@ -52,6 +53,7 @@ def main():
         trainer.load_models(RESUME)
     total_reward = 0
     averagetotoal_reward = 0
+    # MAX_EPISODES = 3
     for _ep in range(1,MAX_EPISODES):
         (obs,tpo) = env.reset()
         observation = obs+list(tpo.reshape(-1,))

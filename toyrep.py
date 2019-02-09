@@ -53,10 +53,16 @@ def topology(x,y):
     #     return 1
     # if(0.4<x<0.6 and 0.45<y<0.55):
     #     return 0.1
+    if MAP=="fence":
+        for f in FENCE:
+            if(abs(x-f.x)<=f.r):
+                return f.h
+        return 0
     height = 0
     for c in CLDS:
         if((x-c.loc[0])**2+(y-c.loc[1])**2<= c.size**2):
             height = max(height,c.size)
+    
     return height
 
 TOPO = topology
@@ -438,7 +444,20 @@ class Cylinder(rep_obj):
     def reset(self):
         pass
 
-
+class Fence(rep_obj):
+    def __init__(self,x,name):
+        self.x = x
+        self.r = 0.05
+        self.h = 0.1
+        super(Fence, self).__init__(name,None)
+    def refresh(self):
+        pass
+    def draw(self,ax):
+        pass
+    def collision_check(self):
+        pass
+    def reset(self):
+        pass
 
         
 
@@ -447,11 +466,13 @@ Toy-rep environment
 """
 OBJS = [Hexpod(),Goal()]
 CLDS = []
+FENCE = []
 for i in range(0, 12):
     CLDS.append(Cylinder( 0.1 , 'Barrier' + str(i)))
 for i in range(0, 6):
     CLDS.append(Cylinder( 0.5 , 'Wall' + str(i)))
-
+for i in range(0,2):
+    FENCE.append(Fence(3+i*0.2,"Fence"+str(i)))
 
 # def collision_check():
 #     for obj in OBJS:

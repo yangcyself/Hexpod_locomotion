@@ -36,6 +36,11 @@ def generateTarget():
 
 
 def topograph(X,Y):
+    if(MAP == "fence"):
+        for x,y,r,h in topolist:
+            if(abs(X-x)<r):
+                return h
+        return 0
     height = 0
     for x,y,r,h in topolist:
         if((x-X)**2+(y-Y)**2<= r**2):
@@ -51,6 +56,13 @@ def barrier_collision(X,Y,R):
 
 def generate_set_TOPO_util(obj,r,h):
     global topolist
+    if(MAP=="fence"):
+        for f in obj:
+            loc = generateTarget()
+            vrep.simxSetObjectPosition(clientID, f, -1, loc,
+                               vrep.simx_opmode_oneshot_wait)
+            topolist.append((loc[0],loc[1],r,h))
+        return
     for b in obj:
         loc = generateTarget()
         while(loc[0]**2+loc[1]**2<1 or barrier_collision(loc[0],loc[1],r)):
@@ -70,12 +82,18 @@ def refresh_TOPO_util(obj,r,h):
 def refresh_TOPO():
     global topolist
     topolist = []
+    if(MAP=="fence"):
+        refresh_TOPO_util(Fence,0.05,0.1)
+        return
     refresh_TOPO_util(Barrier,0.05,0.1)
     refresh_TOPO_util(Wall,0.25,0.5)
 
 def generate_set_TOPO():
     global topolist
     topolist = []
+    if(MAP=="fence"):
+        generate_set_TOPO_util(Fence,0.05,0.1)
+        return
     generate_set_TOPO_util(Barrier,0.05,0.1)
     generate_set_TOPO_util(Wall,0.25,0.5)
 
@@ -154,14 +172,17 @@ def reset():
     global lastdist
     global bestdist
 
-    generate_set_TOPO()
+    if(SETTEDTOPO):
+        refresh_TOPO()
+    else:
+        generate_set_TOPO()
 
-    target = generateTarget()
-    while(target[0]**2+target[1]**2<4):
         target = generateTarget()
+        while(target[0]**2+target[1]**2<4):
+            target = generateTarget()
 
-    target = list(target)
-    vrep.simxSetObjectPosition(clientID, goal, -1, target,
+        target = list(target)
+        vrep.simxSetObjectPosition(clientID, goal, -1, target,
                                vrep.simx_opmode_oneshot_wait)
 
     obs = []
@@ -176,13 +197,14 @@ def reset():
     # loc = list(loc)
     # obs+=loc
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    obs+=list(difftarget[:-1])
+    obs+=list(difftarget)
+    # obs+=list(difftarget[:-1])
     
     obs.append(SIDE)
     dst = distance(obs)
     lastdist = dst
     bestdist = dst
-    assert(len(obs)==15)
+    assert(len(obs)==16)
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
 
@@ -235,6 +257,8 @@ def step(action):
     action = action.reshape(3,2)
     newaction = np.concatenate((action,np.zeros((3,1))),axis = 1)
     assert(newaction.shape==(3,3))
+    if(NOISE):
+        newaction+=np.random.normal(np.zeros_like(newaction),0.01)
 
     three_step(oriPos+newaction,SIDE)
 
@@ -252,11 +276,12 @@ def step(action):
         done = True
    
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    obs+=list(difftarget[:-1])
+    # obs+=list(difftarget[:-1])
+    obs+=list(difftarget)
     # print(difftarget,end = " ")
 
     obs.append(SIDE)
-    assert(len(obs)==15)
+    assert(len(obs)==16)
     dst = distance(obs)
     # print(dst , bestdist)
     # print("orientation:", obs[-5])
@@ -285,7 +310,10 @@ def step(action):
 
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
-
+    if(NOISE):
+        obs = np.array(obs)
+        obs+=np.random.normal([0]*len(obs),0.01)
+        obs = list(obs)
     if(OBSERVETOPO):
         return (obs,topoObservation()) ,reward, done, info
     return obs ,reward, done, info
