@@ -197,14 +197,14 @@ def reset():
     # loc = list(loc)
     # obs+=loc
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    obs+=list(difftarget)
-    # obs+=list(difftarget[:-1])
+    # obs+=list(difftarget)
+    obs+=list(difftarget[:-1])
     
     obs.append(SIDE)
     dst = distance(obs)
     lastdist = dst
     bestdist = dst
-    assert(len(obs)==16)
+    assert(len(obs)==15)
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
 
@@ -276,12 +276,12 @@ def step(action):
         done = True
    
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    # obs+=list(difftarget[:-1])
-    obs+=list(difftarget)
+    obs+=list(difftarget[:-1])
+    # obs+=list(difftarget)
     # print(difftarget,end = " ")
 
     obs.append(SIDE)
-    assert(len(obs)==16)
+    assert(len(obs)==15)
     dst = distance(obs)
     # print(dst , bestdist)
     # print("orientation:", obs[-5])
