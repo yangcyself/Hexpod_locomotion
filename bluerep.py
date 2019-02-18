@@ -377,12 +377,12 @@ def parsePosition(res):
 
 def updateRobotPosition():
     #hexpod.ori ,loc call slam
-    # with open("vec_rot.txt","r") as f:
-    #     line = f.readline()
-    #     nums = line.split(" ")
-    #     for i in range(2):
-    #         hexpod.loc[i] = float(nums[i])
-    #     hexpod.ori = float(nums[5])
+    with open("vec_rot.txt","r") as f:
+        line = f.readline()
+        nums = line.split(" ")
+        for i in range(2):
+            hexpod.loc[i] = float(nums[i])
+        hexpod.ori = float(nums[5])
     # for t in hexpod.tips:
     robot.command("gf",[])
     time.sleep(3)

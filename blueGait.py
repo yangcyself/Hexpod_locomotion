@@ -150,6 +150,7 @@ def three_step_delta(newpos,side,MOD="delta"):
         newpos_delta = np.zeros((3,3))
         for i in range(side,6,2):
             newpos_delta[int(i/2)] = newpos[int(i/2)] - initPos[i]
+    newpos_delta = np.clip(newpos_delta,-0.1,0.1)
     avedelta = np.sum(newpos_delta,axis=0)/6 
     target = initPos-avedelta
 
@@ -160,9 +161,13 @@ def three_step_delta(newpos,side,MOD="delta"):
             pee += list(newpos_delta[int(i/2)][:2])
     # # transTo(target)
     print(pee)
+    
     # print(target)
     print(bodyDiffOri(target))
-    peb = list(avedelta)+[0,0,-bodyDiffOri(target)] #经验之举，否则转反了
+    peb = list(avedelta    )+[0,0,-bodyDiffOri(target)] #经验之举，否则转反了
+    peb[2]=0
+    # pee = np.clip(pee,-0.1,0.1)
+    
     vrep.robotSetFoot(side,pee,peb)
     time.sleep(2)
 

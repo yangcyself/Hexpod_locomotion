@@ -186,6 +186,8 @@ def reset():
                                vrep.simx_opmode_oneshot_wait)
 
     obs = []
+    if(BLUEROBOT):
+        vrep.updateRobotPosition()
     for i in range(6):
         res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)
         loc = list(loc[:-1])
@@ -265,6 +267,9 @@ def step(action):
     # three_step(np.zeros((3,3)),0)
     SIDE = 1-SIDE
     obs = []
+
+    if(BLUEROBOT):
+        vrep.updateRobotPosition()
     for i in range(6):
         res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)       
         loc = list(loc[:-1])
