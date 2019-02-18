@@ -298,7 +298,7 @@ if clientID!=-1:
 if __name__=="__main__":
     #test
     # recover( n=min(N,30))
-    walk_a_step(0.1,math.pi/2)
+    walk_a_step(0.1,0)
     turn_a_deg(0.2)
     # three_step(np.array([[-0.01539664 ,-0.07759521  ,0.        ],
     #                 [-0.09819948 ,-0.05909955  ,0.        ],
