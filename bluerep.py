@@ -15,6 +15,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import math
 import numpy as np
 import time
+import platform
+if(platform.system()=="Linux"):
+    import fcntl
 import slamListener
 from socket import *
 
@@ -378,11 +381,15 @@ def parsePosition(res):
 def updateRobotPosition():
     #hexpod.ori ,loc call slam
     with open("vec_rot.txt","r") as f:
+        
+        fcntl.flock(f,fcntl.LOCK_EX)
         line = f.readline()
         nums = line.split(" ")
         hexpod.loc[0] = float(nums[2])
         hexpod.loc[1] = float(nums[0])
         hexpod.ori = float(nums[5])
+        fcntl.flock(f,fcntl.LOCK_UN)
+
     # for t in hexpod.tips:
 
     print(hexpod.loc,end = "\t")
