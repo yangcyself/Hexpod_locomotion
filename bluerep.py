@@ -434,7 +434,7 @@ def simxSetObjectPosition(ID,obj, cdn, pos ,opmod):
 def simxGetObjectOrientation(ID,obj, cdn ,opmod):
     assert (cdn==-1)
     obj = HANDLE[obj]
-    updateRobotPosition()
+    # updateRobotPosition()
     return 1,np.array([0,0,obj.ori])
 
 def robotSetFoot(side, pee, peb):
