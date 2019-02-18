@@ -330,8 +330,8 @@ class robot_client:
         # return "POSPOS 5e-01,3e-01 0e-01,6e-01 -5e-01,3e-01 5e-01,-3e-01 0e-01,-6e-01 -5e-01,-3e-01"
         return res
     def __del__(self):
-        self.command("ds",[])
-        self.command("exit",[])
+        # self.command("ds",[])
+        # self.command("exit",[])
         self.tctimeClient.close()
 
 robot  = robot_client()
@@ -387,7 +387,9 @@ def updateRobotPosition():
         nums = line.split(" ")
         hexpod.loc[0] = float(nums[2])
         hexpod.loc[1] = float(nums[0])
-        hexpod.ori = float(nums[5])
+        print("vec_rot:",end = " ")
+        print (nums)
+        hexpod.ori = float(nums[4])
         fcntl.flock(f,fcntl.LOCK_UN)
 
     # for t in hexpod.tips:
