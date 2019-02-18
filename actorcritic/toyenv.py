@@ -55,6 +55,8 @@ def generate_set_TOPO_util(obj,r,h):
         loc = generateTarget()
         while(loc[0]**2+loc[1]**2<1 or barrier_collision(loc[0],loc[1],r)):
             loc = generateTarget()
+        if(BLUEROBOT):
+            loc = [1,0.5,0]
         loc[2] = h/2
         vrep.simxSetObjectPosition(clientID, b, -1, loc,
                                vrep.simx_opmode_oneshot_wait)
@@ -167,13 +169,16 @@ def reset():
     else:
         generate_set_TOPO()
 
-        target = generateTarget()
-        while(target[0]**2+target[1]**2<4):
+        if(BLUEROBOT):
+            target = [2,0,0.2]
+        else:
             target = generateTarget()
+            while(target[0]**2+target[1]**2<4):
+                target = generateTarget()
 
-        target = list(target)
+            target = list(target)
         vrep.simxSetObjectPosition(clientID, goal, -1, target,
-                               vrep.simx_opmode_oneshot_wait)
+                            vrep.simx_opmode_oneshot_wait)
 
     obs = []
     for i in range(6):

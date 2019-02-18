@@ -385,8 +385,8 @@ def updateRobotPosition():
         fcntl.flock(f,fcntl.LOCK_EX)
         line = f.readline()
         nums = line.split(" ")
-        hexpod.loc[0] = float(nums[2])
-        hexpod.loc[1] = float(nums[0])
+        hexpod.loc[0] = -float(nums[2])/1000
+        hexpod.loc[1] = -float(nums[0])/1000
         print("vec_rot:",end = " ")
         print (nums)
         hexpod.ori = float(nums[4])
