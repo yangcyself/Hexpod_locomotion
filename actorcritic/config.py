@@ -31,6 +31,10 @@ TIPS_distance = True
 DISPLAY = False
 
 BLUEROBOT = ENVIRONMENT=="BLUE"
+import platform
+    
+FCNTL = platform.system()=="Linux"
+
 
 #Reward Options:
 RWD_PAIN = True

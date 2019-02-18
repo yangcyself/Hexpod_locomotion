@@ -283,7 +283,7 @@ def step(action):
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
     obs+=list(difftarget[:-1])
     # obs+=list(difftarget)
-    # print(difftarget,end = " ")
+    print("DIFFTARGET:",difftarget)
 
     obs.append(SIDE)
     assert(len(obs)==15)

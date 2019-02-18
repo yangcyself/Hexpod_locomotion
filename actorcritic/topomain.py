@@ -30,7 +30,7 @@ MAX_TOTAL_REWARD = 300
 # A_DIM = env.action_space.shape[0]
 # A_MAX = env.action_space.high[0]
 
-S_DIM = 1616 #1600 + 160 + 15
+S_DIM = 1615 #1600 + 160 + 15
 if(FUTHERTOPO):
     S_DIM += 144
 A_DIM = 6
@@ -57,7 +57,7 @@ def main():
     for _ep in range(1,MAX_EPISODES):
         (obs,tpo) = env.reset()
         observation = obs+list(tpo.reshape(-1,))
-        _ep = _ep+RESUME
+        # _ep = _ep+RESUME
         print("last total reward:", total_reward)
         averagetotoal_reward += total_reward
         total_reward = 0
@@ -104,6 +104,9 @@ def main():
                 logger.scalar_summary(tag, value, _ep)
 
             averagetotoal_reward = 0
+
+        if(BLUEROBOT):
+            break
 
     print ('Completed episodes')
 
