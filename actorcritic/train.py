@@ -9,7 +9,8 @@ import math
 
 import utils
 # import model
-import topoModel as model
+# import topoModel as model
+import Largermodel as model
 
 BATCH_SIZE = 128
 LEARNING_RATE = 0.0001
@@ -36,11 +37,11 @@ class Trainer:
 
 		self.actor = model.Actor(self.state_dim, self.action_dim, self.action_lim)
 		self.target_actor = model.Actor(self.state_dim, self.action_dim, self.action_lim)
-		self.actor_optimizer = torch.optim.Adam(self.actor.parameters(),LEARNING_RATE)
+		self.actor_optimizer = torch.optim.Adam(self.actor.parameters(),LEARNING_RATE,weight_decay=1e-5)
 
 		self.critic = model.Critic(self.state_dim, self.action_dim)
 		self.target_critic = model.Critic(self.state_dim, self.action_dim)
-		self.critic_optimizer = torch.optim.Adam(self.critic.parameters(),LEARNING_RATE*10)
+		self.critic_optimizer = torch.optim.Adam(self.critic.parameters(),LEARNING_RATE*10,weight_decay=1e-5)
 
 		if(USEGPU):
 			self.target_actor = self.target_actor.cuda()

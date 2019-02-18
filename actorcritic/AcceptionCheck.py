@@ -19,11 +19,11 @@ import toyenv as env
 from config import*
 import pickle as pkl
 
-with open("cmpRes.pkl","rb") as f:
+with open("cmpRes_C.pkl","rb") as f:
     cmpRes = pkl.load(f)
 
 MAX_EPISODES = 50000
-MAX_STEPS = 35
+MAX_STEPS = 100
 MAX_BUFFER = 10000
 MAX_TOTAL_REWARD = 300
 
@@ -33,8 +33,10 @@ if(FUTHERTOPO):
 A_DIM = 6
 A_MAX = 0.25
 
-CMPLIST = [100,500,600,1000,1500,2000,3000,3500,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000]#,17000,19000,22000,25000,28000,30000]
-CMPMODS = ["hopior/","savior/"]
+# CMPLIST = [100,500,600,1000,1500,2000,3000,3500,4000,5000,6000,7000,8000,9000,10000,11000,12000,13000,14000,15000]#,17000,19000,22000,25000,28000,30000]
+CMPLIST = [2000,2100,2200,2300,2400]
+CMPMODS = ["crosor/"]
+# CMPMODS = ["hopior/","savior/"]
 print (' State Dimensions :- ', S_DIM)
 print (' Action Dimensions :- ', A_DIM)
 print (' Action Max :- ', A_MAX)
@@ -77,5 +79,5 @@ for M in CMPMODS:
         print(total_reward)
         cmpRes[M][N] = total_reward
 
-with open("cmpRes.pkl","wb") as f:
+with open("cmpRes_C.pkl","wb") as f:
     pkl.dump(cmpRes,f)

@@ -24,6 +24,7 @@ def recover(n=N):
     Lz = np.zeros(n+1)
     init_position = np.zeros((6, 3))
     time.sleep(3)
+    vrep.updateRobotPosition()
     for i in range(6):
         res, init_position[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(1,n+1):
@@ -68,6 +69,7 @@ def transTo(target,n=N): #TODO: make max step length or
 
     assert(target.shape==(6,3))
     initPos = np.zeros((6, 3))
+    vrep.updateRobotPosition()
     for i in range(6):
         res, initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     delta = (target - initPos)/n
@@ -119,21 +121,37 @@ def averageOri(target):
         ang[i] = math.atan2(target[i][1],target[i][0])
     return ave_ang(ang)
 
-def three_step_delta(newpos_delta,side):
+def bodyDiffOri(target):
+    ang = np.zeros(6)
+    basAng = [1,3,5,-1,-3,-5]
+    basAng = np.array(basAng)*math.pi/6
+    for i in range(0,6):
+        ang[i] = math.atan2(target[i][1],target[i][0])
+        deg = ave_ang(ang-basAng)
+    return deg
+
+
+
+def three_step_delta(newpos,side,MOD="delta"):
     """
     newpos is the difference between the new position and the present position of the three peds
     3*3, the z
     side = 0 or 1
     assume that the body position is above the middle of the foot (x,y)s.
     """
-    # height = 0.25
-    avedelta = np.sum(newpos_delta,axis=0)/6 
-
-    # #lift up:
     initPos = np.zeros((6, 3))
+    vrep.updateRobotPosition()
     for i in range(6):
         res, initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-    target = initPos
+    # height = 0.25
+    if(MOD=="delta"):
+        newpos_delta = newpos
+    else:
+        newpos_delta = np.zeros((3,3))
+        for i in range(side,6,2):
+            newpos_delta[int(i/2)] = newpos[int(i/2)] - initPos[i]
+    avedelta = np.sum(newpos_delta,axis=0)/6 
+    target = initPos-avedelta
 
     pee = []
     for i in range(6):
@@ -142,21 +160,27 @@ def three_step_delta(newpos_delta,side):
             pee += list(newpos_delta[int(i/2)][:2])
     # # transTo(target)
     print(pee)
-    peb = list(avedelta)+[0,0,averageOri(target)]
+    # print(target)
+    print(bodyDiffOri(target))
+    peb = list(avedelta)+[0,0,-bodyDiffOri(target)] #经验之举，否则转反了
     vrep.robotSetFoot(side,pee,peb)
+    time.sleep(2)
 
     
-def three_step(newpos,side):
-
-    initPos = np.zeros((3, 3))
-    for i in range(side,6,2):
-        res,initPos[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-    three_step_delta(newpos-initPos,side)
+def three_step(newpos,side,initPos=None):
+    three_step_delta(newpos,side,MOD="abslute")
+    # vrep.updateRobotPosition()
+    # if(not initPos):
+    #     initPos = np.zeros((3, 3))
+    #     for i in range(side,6,2):
+    #         res,initPos[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
+    #     three_step_delta(newpos-initPos,side)
 
 def print_steps():
     import matplotlib.pyplot as plt
     x=[]
     y = []
+    vrep.updateRobotPosition()
     for i in range(6):
         res, Pos = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
         x.append(Pos[0])
@@ -173,6 +197,7 @@ def walk_a_step(length=0.3,deg=0):
 
 def turn_a_deg(deg):
     target = np.zeros((3,3))
+    vrep.updateRobotPosition()
     for i in range(0,6,2):
         res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(3):
@@ -181,7 +206,7 @@ def turn_a_deg(deg):
         target[i][0] = dist*math.cos(ang+deg)
         target[i][1] = dist*math.sin(ang+deg)
     three_step(target,0)
-    
+    vrep.updateRobotPosition()
     for i in range(1,6,2):
         res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(3):
@@ -268,8 +293,8 @@ if clientID!=-1:
 if __name__=="__main__":
     #test
     # recover( n=min(N,30))
-    walk_a_step(0.3,math.pi/2)
-    turn_a_deg(0.5)
+    walk_a_step(0.1,math.pi/2)
+    turn_a_deg(0.2)
     # three_step(np.array([[-0.01539664 ,-0.07759521  ,0.        ],
     #                 [-0.09819948 ,-0.05909955  ,0.        ],
     #                 [ 0.10317233 ,-0.05715271  ,0.        ]]),0)

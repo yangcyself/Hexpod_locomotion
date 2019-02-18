@@ -4,6 +4,9 @@
 import toyrep as vrep
 N=5
 别的不变
+
+注意bluerep 和toyrep之间坐标系的区别：
+    x，y需要交换，取相反数
 """
 
 import matplotlib.pyplot as plt
@@ -13,6 +16,8 @@ import math
 import numpy as np
 import time
 import slamListener
+from socket import *
+
 
 WORLD_SIZE = [-5,5]
 
@@ -298,23 +303,33 @@ for i in range(0, 6):
 
 class robot_client:
     def __init__(self):
-        # self.s = pxssh.pxssh()
-        # hostname = "202.120.38.59"
-        # username = "hexpodmlc"
-        # password = "321hexpod"
-        # self.s.login(hostname, username, password)
-        # self.s.sendline('uptime')   # run a command
-        # self.s.prompt()             # match the prompt
-        pass
-# print(s.before.decode("utf8"))        # print everything before the prompt.
+        HOST ='192.168.2.100'
+        PORT = 5866
+        self.BUFFSIZE=2048       
+        ADDR = (HOST,PORT)
+        self.tctimeClient = socket(AF_INET,SOCK_STREAM)
+        self.tctimeClient.connect(ADDR)
+        self.command("start",[])
+        time.sleep(2)
+        self.command("en",[])
+        time.sleep(2)
+        self.command("hm",[])
+        time.sleep(5)
+        self.command("rc",[])
+        time.sleep(2)
+        
     def command(self, command ,args):
-        # self.s.sendline(command + " ".join(args))
-        # time.sleep(0.1)
-        # self.s.prompt()
-        # res = self.s.before.decode("utf8")
-        # return res
-        pass
-        return "POSPOS 5e-01,3e-01 0e-01,6e-01 -5e-01,3e-01 5e-01,-3e-01 0e-01,-6e-01 -5e-01,-3e-01"
+        data = command+ " " + " ".join(args)
+        print(data)
+        self.tctimeClient.send((chr(len(data)+1)+chr(0)*7+chr(1)+chr(0)*31+data+chr(0)).encode())
+        res = self.tctimeClient.recv(self.BUFFSIZE)[40:].decode("utf8")
+        print("RES:",res)
+        # return "POSPOS 5e-01,3e-01 0e-01,6e-01 -5e-01,3e-01 5e-01,-3e-01 0e-01,-6e-01 -5e-01,-3e-01"
+        return res
+    def __del__(self):
+        self.command("ds",[])
+        self.command("exit",[])
+        self.tctimeClient.close()
 
 robot  = robot_client()
 
@@ -347,36 +362,34 @@ def listTOPO():
         print(b.loc)
 
 def parsePosition(res):
-    print(res)
-    lines = res.split("\n")
     ans = np.zeros((6,2))
-    for i in range(1,len(lines)+1):
-        if("POSPOS" in lines[-i] ):
-            index = lines[-i].find("POSPOS")
-            lin = lines[-i][index+6:].strip()
-            pos = lin.split(" ")
-            for i,p in enumerate(pos):
-                ps = p.split(",")
-                # print("p:",p)
-                for j in range(2):
-                    # print(ps[j])
-                    hexpod.tips[i].p[j] = ps[j]
-                    ans[i][j] = float(ps[j])
+    lin = res[:-1].strip()
+    pos = lin.split(" ")
+    for i,p in enumerate(pos):
+        ps = p.split(",")
+        # print("p:",p)
+        for j in range(2):
+            # print(ps[j])
+            hexpod.tips[i].p[1-j] = -float(ps[j])
+            ans[i][1-j] = -float(ps[j])
     return ans
 
 
 def updateRobotPosition():
     #hexpod.ori ,loc call slam
-    with open("vec_rot.txt","r") as f:
-        line = f.readline()
-        nums = line.split(" ")
-        for i in range(2):
-            hexpod.loc[i] = float(nums[i])
-        hexpod.ori = float(nums[5])
+    # with open("vec_rot.txt","r") as f:
+    #     line = f.readline()
+    #     nums = line.split(" ")
+    #     for i in range(2):
+    #         hexpod.loc[i] = float(nums[i])
+    #     hexpod.ori = float(nums[5])
     # for t in hexpod.tips:
-    
-    res = robot.command("./rbt gf",[])
+    robot.command("gf",[])
+    time.sleep(3)
+    res = robot.command("gf",["-i=1"])
+    print(res)
     assert(res)
+
     parsePosition(res)
     
     
@@ -392,7 +405,7 @@ def simxGetObjectHandle(ID,name,opmod):
 def simxGetObjectPosition(ID, obj, cdn, opmod):
 
     obj = HANDLE[obj]
-    updateRobotPosition()
+    
     if(cdn==-1):
         #CALL SLAM API
         return 1, obj.loc
@@ -425,12 +438,20 @@ def simxGetObjectOrientation(ID,obj, cdn ,opmod):
     return 1,np.array([0,0,obj.ori])
 
 def robotSetFoot(side, pee, peb):
-    command = "./rbt sf "
+    print("Begin Set Foot:", side )
+    command = "sf "
     args = ["-i=%d" %side]
-    for i,a in enumerate(["-a","-d","-b","-e","-c","-f"]):
-        args.append(a+"="+str(pee[i]))
-    for i,a in enumerate(["-g","-j","-h","-k","-l","-m"]):
-        args.append(a+"="+str(peb[i]))
+    # for i,a in enumerate(["-a","-d","-b","-e","-c","-f"]):
+    for i,a in enumerate(["-d","-a","-e","-b","-f","-c"]):
+        # args.append(a+"="+str(pee[i]))
+        args.append(a+"="+"%.3f" % -pee[i])
+    for i,a in enumerate(["-j","-g","-h"]):
+        # args.append(a+"="+str(peb[i]))
+        args.append(a+"="+"%.3f" % -peb[i])
+    for i, a in enumerate(["-k","-l","-m"]):
+        args.append(a+"="+"%.3f" % peb[i+3])
+    # print(args)
+    # time.sleep(5)
     robot.command(command,args)
 
 # def drawPoint(loc):
@@ -443,45 +464,48 @@ def robotSetFoot(side, pee, peb):
 
 plt.show(block=False)
 if __name__ == "__main__":
-    n = 30
 
-    simxFinish(-1) # just in case, close all opened connections
-    clientID=simxStart('127.0.0.1',19997,True,True,-500000,5) # Connect to V-REP, set a very large time-out for blocking commands
-    if clientID!=-1:
-        print ('Connected to remote API server')
-        res = simxSynchronous(clientID, True)
+    updateRobotPosition()
 
-    simxStartSimulation(clientID, simx_opmode_oneshot_wait)
-    res, BCS = simxGetObjectHandle(clientID, 'BCS', simx_opmode_blocking)
-    res, goal = simxGetObjectHandle(clientID, 'Goal', simx_opmode_blocking)
-    S1 = np.zeros(6, dtype='int32')
-    for i in range(0, 6):
-        res, S1[i] = simxGetObjectHandle(clientID, 'Tip' + str(i + 1), simx_opmode_blocking)
-    Tip_target = np.zeros(6, dtype='int32')
-    for i in range(0, 6):
-        res, Tip_target[i] = simxGetObjectHandle(clientID, 'TipTarget' + str(i + 1), simx_opmode_blocking)
+    # n = 30
 
-    Lz = np.zeros(n+1)
-    init_position = np.zeros((6, 3))
+    # simxFinish(-1) # just in case, close all opened connections
+    # clientID=simxStart('127.0.0.1',19997,True,True,-500000,5) # Connect to V-REP, set a very large time-out for blocking commands
+    # if clientID!=-1:
+    #     print ('Connected to remote API server')
+    #     res = simxSynchronous(clientID, True)
 
-    # print(simxGetObjectPosition)
-    for i in range(6):
-        res, init_position[i] = simxGetObjectPosition(clientID, S1[i], BCS, simx_opmode_oneshot_wait)
-    for i in range(1,n+1):
-        Lz[i] = init_position[0][2] - i * 0.1/n
+    # simxStartSimulation(clientID, simx_opmode_oneshot_wait)
+    # res, BCS = simxGetObjectHandle(clientID, 'BCS', simx_opmode_blocking)
+    # res, goal = simxGetObjectHandle(clientID, 'Goal', simx_opmode_blocking)
+    # S1 = np.zeros(6, dtype='int32')
+    # for i in range(0, 6):
+    #     res, S1[i] = simxGetObjectHandle(clientID, 'Tip' + str(i + 1), simx_opmode_blocking)
+    # Tip_target = np.zeros(6, dtype='int32')
+    # for i in range(0, 6):
+    #     res, Tip_target[i] = simxGetObjectHandle(clientID, 'TipTarget' + str(i + 1), simx_opmode_blocking)
 
-    for i in range(1,n+1):
-        for j in range(0,6,2):
-            simxSynchronousTrigger(clientID)
-            simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
-                         simx_opmode_oneshot_wait)
+    # Lz = np.zeros(n+1)
+    # init_position = np.zeros((6, 3))
+
+    # # print(simxGetObjectPosition)
+    # for i in range(6):
+    #     res, init_position[i] = simxGetObjectPosition(clientID, S1[i], BCS, simx_opmode_oneshot_wait)
+    # for i in range(1,n+1):
+    #     Lz[i] = init_position[0][2] - i * 0.1/n
+
+    # for i in range(1,n+1):
+    #     for j in range(0,6,2):
+    #         simxSynchronousTrigger(clientID)
+    #         simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
+    #                      simx_opmode_oneshot_wait)
+    # # simxSynchronousTrigger(clientID)
+    # for i in range(1,n+1):
+    #     for j in range(1,6,2):
+    #         simxSynchronousTrigger(clientID)
+    #         simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
+    #                            simx_opmode_oneshot_wait)
     # simxSynchronousTrigger(clientID)
-    for i in range(1,n+1):
-        for j in range(1,6,2):
-            simxSynchronousTrigger(clientID)
-            simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
-                               simx_opmode_oneshot_wait)
-    simxSynchronousTrigger(clientID)
 
 
 
