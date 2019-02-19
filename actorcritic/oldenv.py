@@ -339,7 +339,10 @@ def step(action):
         obs = list(obs)
 
     if(DISPLAY_OBS):
-        ax.imshow(topoObservation())
+        topoobs = topoObservation()
+        for i in range(6):
+            topoobs[int((obs[i]+1)*20)][int((obs[i+1]+1)*20)] = 0.05
+        ax.imshow(topoobs)
         fig.canvas.draw()
 
     if(OBSERVETOPO):
@@ -362,7 +365,8 @@ def mystep(act):
 if(DISPLAY_OBS):
     fig = plt.figure()
     ax = fig.gca()
-    ax.imshow(topoObservation())
+    obs = topoObservation()
+    ax.imshow(obs)
     plt.show(block=False) 
 
 if __name__ == "__main__":

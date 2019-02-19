@@ -21,7 +21,7 @@ assert((SETMAP and not SETTEDTOPO )or (not SETMAP and SETTEDTOPO))
 
 
 #Configues for topomain
-RESUME = 19300
+RESUME = 2000
 # RESUME = "savior/2700"
 LOGGING = False
 OBSERVETOPO = True
