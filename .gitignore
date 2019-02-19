@@ -1,3 +1,4 @@
 actorcritic/Models/*
 actorcritic/__pycache__/*
 __pycache__/*
+actorcritic/vec_rot.txt
