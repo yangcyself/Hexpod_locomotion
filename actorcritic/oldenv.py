@@ -217,14 +217,14 @@ def reset():
     # loc = list(loc)
     # obs+=loc
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    # obs+=list(difftarget)
-    obs+=list(difftarget[:-1])
+    obs+=list(difftarget)
+    # obs+=list(difftarget[:-1])
     
     obs.append(SIDE)
     dst = distance(obs)
     lastdist = dst
     bestdist = dst
-    assert(len(obs)==15)
+    assert(len(obs)==16)
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
 
@@ -318,12 +318,12 @@ def step(action):
         done = True
    
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    obs+=list(difftarget[:-1])
-    # obs+=list(difftarget)
+    # obs+=list(difftarget[:-1])
+    obs+=list(difftarget)
     print("DIFFTARGET:",difftarget)
 
     obs.append(SIDE)
-    assert(len(obs)==15)
+    assert(len(obs)==16)
     dst = distance(obs)
     # print(dst , bestdist)
     # print("orientation:", obs[-5])
@@ -359,10 +359,15 @@ def step(action):
 
     if(DISPLAY_OBS):
         # topoobs = topoObservation()
+        ax.clear()
         display()
         # for i in range(6):
         #     topoobs[int((obs[i]+1)*20)][int((obs[i+1]+1)*20)] = 0.05
         # ax.imshow(topoobs)
+        # ax.autoscale([-5,5],[-5,5])
+        
+        ax.set_xlim(-1,5)
+        ax.set_ylim(-3,3)
         fig.canvas.draw()
 
     if(OBSERVETOPO):
@@ -375,6 +380,7 @@ running  = False
 target = generateTarget()
 while(target[0]**2+target[1]**2<4):
     target = generateTarget()
+target = [4,0,0.2]
 lastdist = -1
 bestdist = -1
 
@@ -388,6 +394,9 @@ if(DISPLAY_OBS):
     # obs = topoObservation()
     # ax.imshow(obs)
     display()
+    # ax.autoscale([-5,5],[-5,5])
+    ax.set_xlim(-1,5)
+    ax.set_ylim(-3,3)
     # fig.canvas.draw()
     plt.show(block=False) 
 

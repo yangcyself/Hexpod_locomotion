@@ -9,7 +9,7 @@ FILEOUT = False
 FILEOUT = FILEOUT and ENVIRONMENT=="TOY"
 
 REFRESHTOPO = True
-FUTHERTOPO = True
+FUTHERTOPO = False
 # SETTEDTOPO = True
 SETTEDTOPO = False
 DISPLAY_OBS=True
@@ -17,11 +17,12 @@ DISPLAY_OBS=True
 MAP = None
 NOISE = False
 SETMAP = True
+CLIP = True
 assert((SETMAP and not SETTEDTOPO )or (not SETMAP and SETTEDTOPO))
 
 
 #Configues for topomain
-RESUME = 2000
+RESUME = 9200
 # RESUME = "savior/2700"
 LOGGING = False
 OBSERVETOPO = True
