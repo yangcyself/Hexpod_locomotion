@@ -10,12 +10,14 @@ FILEOUT = FILEOUT and ENVIRONMENT=="TOY"
 
 REFRESHTOPO = True
 FUTHERTOPO = True
-SETTEDTOPO = True
-# SETTEDTOPO = False
+# SETTEDTOPO = True
+SETTEDTOPO = False
 DISPLAY_OBS=True
 # MAP = "fence"
 MAP = None
 NOISE = False
+SETMAP = True
+assert((SETMAP and not SETTEDTOPO )or (not SETMAP and SETTEDTOPO))
 
 
 #Configues for topomain
