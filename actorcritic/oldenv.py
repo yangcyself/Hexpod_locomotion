@@ -107,7 +107,7 @@ def set_map_util(obj,r,h,pos):
 
 def set_map():
     set_map_util(Barrier,0.05,0.1,[[0.5,0,0.05]]*12)
-    set_map_util(Wall,0.25,0.5,[[2,0,0.25]]*6)
+    set_map_util(Wall,0.25,0.5,[[5,0,0.25]]*6)
 
 
 def topoObservation():
