@@ -383,8 +383,12 @@ def updateRobotPosition():
     with open("vec_rot.txt","r") as f:
         
         fcntl.flock(f,fcntl.LOCK_EX)
+        
         line = f.readline()
         nums = line.split(" ")
+        while (len(nums)<6):
+            line = f.readline()
+            nums = line.split(" ")
         hexpod.loc[0] = -float(nums[2])/1000
         hexpod.loc[1] = -float(nums[0])/1000
         print("vec_rot:",end = " ")

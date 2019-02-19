@@ -12,6 +12,7 @@ from logger import Tlogger
 tlogger = Tlogger
 print(tlogger)
 
+import matplotlib.pyplot as plt
 SIDE = 0
 PAIN_GAMMA = 1
 
@@ -317,10 +318,16 @@ def step(action):
         obs+=futherTopoObservation()
     if(NOISE):
         obs = np.array(obs)
-        obs+=np.random.normal([0]*len(obs),0.01)
+        obs+= np.random.normal([0]*len(obs),0.01)
         obs = list(obs)
+
+    if(DISPLAY_OBS):
+        ax.imshow(topoObservation())
+        fig.canvas.draw()
+
     if(OBSERVETOPO):
         return (obs,topoObservation()) ,reward, done, info
+
     return obs ,reward, done, info
 
 
@@ -335,6 +342,11 @@ def mystep(act):
     # act = act.reshape(3,2)
     three_step(act,0)
 
+if(DISPLAY_OBS):
+    fig = plt.figure()
+    ax = fig.gca()
+    ax.imshow(topoObservation())
+    plt.show(block=False) 
 
 if __name__ == "__main__":
     # reset()

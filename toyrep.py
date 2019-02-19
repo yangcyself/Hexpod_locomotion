@@ -578,7 +578,6 @@ def simxGetObjectOrientation(ID,obj, cdn ,opmod):
 if(DISPLAY):
     fig = plt.figure()
     ax = fig.gca(projection='3d')
-    ax2 = fig.gca(projection = '3d')
     ax.auto_scale_xyz(WORLD_SIZE,WORLD_SIZE,[0,5])
 # ax.autoscale(enable=False, axis='both', tight=None)
 plt.show(block=False)
