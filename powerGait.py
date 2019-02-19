@@ -138,6 +138,11 @@ def three_step_delta(newpos_delta,side):
     assume that the body position is above the middle of the foot (x,y)s.
     """
     height = 0.25
+
+    if(CLIP):
+        newpos_delta = np.clip(newpos_delta,-0.1,0.1)
+
+
     avedelta = np.sum(newpos_delta,axis=0)/6 
 
     #lift up:

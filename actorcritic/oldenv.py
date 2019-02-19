@@ -261,6 +261,25 @@ def dangerous(obs):
 rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
 
 
+def display():
+    for x,y,r,h in topolist:
+        X=[x-r,x-r,x+r,x+r,x-r]
+        Y=[y-r,y+r,y+r,y-r,y-r]
+        ax.plot(X,Y)
+    x = target[0]
+    y = target[1]
+    r = 0.1
+    X=[x-r,x-r,x+r,x+r,x-r]
+    Y=[y-r,y+r,y+r,y-r,y-r]
+    ax.plot(X,Y)
+    res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    x = loc[0]
+    y = loc[1]
+    X=[x-r,x-r,x+r,x+r,x-r]
+    Y=[y-r,y+r,y+r,y-r,y-r]
+    ax.plot(X,Y)
+
+
 def step(action):
 
     global lastdist
@@ -339,10 +358,11 @@ def step(action):
         obs = list(obs)
 
     if(DISPLAY_OBS):
-        topoobs = topoObservation()
-        for i in range(6):
-            topoobs[int((obs[i]+1)*20)][int((obs[i+1]+1)*20)] = 0.05
-        ax.imshow(topoobs)
+        # topoobs = topoObservation()
+        display()
+        # for i in range(6):
+        #     topoobs[int((obs[i]+1)*20)][int((obs[i+1]+1)*20)] = 0.05
+        # ax.imshow(topoobs)
         fig.canvas.draw()
 
     if(OBSERVETOPO):
@@ -365,8 +385,10 @@ def mystep(act):
 if(DISPLAY_OBS):
     fig = plt.figure()
     ax = fig.gca()
-    obs = topoObservation()
-    ax.imshow(obs)
+    # obs = topoObservation()
+    # ax.imshow(obs)
+    display()
+    # fig.canvas.draw()
     plt.show(block=False) 
 
 if __name__ == "__main__":
