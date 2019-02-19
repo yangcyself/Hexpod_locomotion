@@ -55,8 +55,6 @@ def generate_set_TOPO_util(obj,r,h):
         loc = generateTarget()
         while(loc[0]**2+loc[1]**2<1 or barrier_collision(loc[0],loc[1],r)):
             loc = generateTarget()
-        if(BLUEROBOT):
-            loc = [1,0.5,0]
         loc[2] = h/2
         vrep.simxSetObjectPosition(clientID, b, -1, loc,
                                vrep.simx_opmode_oneshot_wait)

@@ -106,8 +106,8 @@ def set_map_util(obj,r,h,pos):
         topolist.append((loc[0],loc[1],r,h))
 
 def set_map():
-    set_map_util(Barrier,0.05,0.1,[[0.5,0,0.05]]*12)
-    set_map_util(Wall,0.25,0.5,[[5,0,0.25]]*6)
+    set_map_util(Barrier,0.05,0.1,[[1,0,0.05]]*12)
+    set_map_util(Wall,0.25,0.5,[[2,0,0.25]]*6)
 
 
 def topoObservation():
@@ -186,7 +186,7 @@ def reset():
         refresh_TOPO()
     elif SETMAP:
         set_map()
-        target = [1,0,0.2]
+        target = [4,0,0.2]
         vrep.simxSetObjectPosition(clientID, goal, -1, target,
                                vrep.simx_opmode_oneshot_wait)
     else:
