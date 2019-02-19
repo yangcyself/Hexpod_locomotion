@@ -400,7 +400,7 @@ def updateRobotPosition():
     print(hexpod.loc,end = "\t")
     print(hexpod.ori)
     robot.command("gf",[])
-    time.sleep(3)
+    time.sleep(2)
     res = robot.command("gf",["-i=1"])
     print(res)
     assert(res)

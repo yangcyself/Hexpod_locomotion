@@ -150,7 +150,7 @@ def three_step_delta(newpos,side,MOD="delta"):
         newpos_delta = np.zeros((3,3))
         for i in range(side,6,2):
             newpos_delta[int(i/2)] = newpos[int(i/2)] - initPos[i]
-    newpos_delta = np.clip(newpos_delta,-0.1,0.1)
+    newpos_delta = np.clip(newpos_delta,-0.08,0.08)
     avedelta = np.sum(newpos_delta,axis=0)/6 
     target = initPos-avedelta
 

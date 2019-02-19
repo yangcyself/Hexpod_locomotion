@@ -35,7 +35,8 @@ if(FUTHERTOPO):
     S_DIM += 144
 A_DIM = 6
 # A_MAX = 0.3
-A_MAX = 0.25
+# A_MAX = 0.25
+A_MAX = 0.2
 
 
 print (' State Dimensions :- ', S_DIM)
