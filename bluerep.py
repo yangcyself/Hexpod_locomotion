@@ -339,7 +339,7 @@ def parsePosition(res):
 
 def updateRobotPosition():
     #hexpod.ori ,loc call slam
-    return
+    # return
     with open("vec_rot.txt","r") as f:
         # fcntl.flock(f,fcntl.LOCK_EX)
         
@@ -348,8 +348,8 @@ def updateRobotPosition():
         while (len(nums)<6):
             line = f.readline()
             nums = line.split(" ")
-        hexpod.loc[0] = -float(nums[2])/100
-        hexpod.loc[1] = float(nums[0])/100
+        hexpod.loc[0] = -float(nums[0])
+        hexpod.loc[1] = -float(nums[1])
         # print("vec_rot:",end = " ")
         # print (nums)
         hexpod.ori = float(nums[4])
