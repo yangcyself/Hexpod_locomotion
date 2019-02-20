@@ -9,7 +9,8 @@ FILEOUT = False
 FILEOUT = FILEOUT and ENVIRONMENT=="TOY"
 
 REFRESHTOPO = True
-FUTHERTOPO = False
+# FUTHERTOPO = False
+FUTHERTOPO = True
 # SETTEDTOPO = True
 SETTEDTOPO = False
 DISPLAY_OBS=True
@@ -22,8 +23,9 @@ assert((SETMAP and not SETTEDTOPO )or (not SETMAP and SETTEDTOPO))
 
 
 #Configues for topomain
-RESUME = "exp1/9200"
-# RESUME = "savior/2700"
+RESUME = 22300
+# RESUME = 3400
+# RESUME = "hopior/22000"
 LOGGING = False
 OBSERVETOPO = True
 TESTBEHAVE = True

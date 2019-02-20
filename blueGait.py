@@ -163,11 +163,9 @@ def three_step_delta(newpos,side,MOD="delta"):
     # print(pee)
     
     # print(target)
-    print(bodyDiffOri(target))
-    peb = list(avedelta    )+[0,0,-bodyDiffOri(target)] #经验之举，否则转反了
+    peb = list(avedelta    )+[0,0,bodyDiffOri(target)] #经验之举，否则转反了 #但是应该代表需要转的角度
     peb[2]=0
     # pee = np.clip(pee,-0.1,0.1)
-    
     vrep.robotSetFoot(side,pee,peb)
     time.sleep(2)
 
@@ -293,6 +291,35 @@ if clientID!=-1:
     Tip_target = np.zeros(6, dtype='int32')
     for i in range(0, 6):
         res, Tip_target[i] = vrep.simxGetObjectHandle(clientID, 'TipTarget' + str(i + 1), vrep.simx_opmode_blocking)
+
+
+
+"""
+interface for tcd qlearning
+"""
+def robot_position(): 
+    return vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)[1][:2]
+def target_position():
+    return vrep.simxGetObjectPosition(clientID,goal,-1,vrep.simx_opmode_oneshot_wait)[1][:2]
+def target_orient():
+    _,loc = vrep.simxGetObjectPosition(clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
+    print("loc:",loc)
+    return math.atan2(loc[1],loc[0])
+def turnleft():
+    turn_a_deg(0.2)
+def turnright():
+    turn_a_deg(-0.2)
+def forward():
+    walk_a_step(0.1,0)
+def reset():
+    vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
+    time.sleep(2)
+    status = vrep.simxStartSimulation(clientID, vrep.simx_opmode_blocking)
+
+def exit():
+    vrep.simxFinish(clientID)
+    time.sleep(1)
+    vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
 
 
 if __name__=="__main__":

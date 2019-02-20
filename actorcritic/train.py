@@ -9,8 +9,8 @@ import math
 
 import utils
 # import model
-import topoModel as model
-# import Largermodel as model
+# import topoModel as model
+import Largermodel as model
 
 BATCH_SIZE = 128
 LEARNING_RATE = 0.0001

@@ -19,6 +19,7 @@ import platform
 if(platform.system()=="Linux"):
     import fcntl
 import slamListener
+from actorcritic.config import *
 from socket import *
 
 
@@ -368,6 +369,28 @@ def updateRobotPosition():
     
     
 
+def display():
+    for c in CLDS:
+        x = c.loc[0]
+        y = c.loc[1]
+        r = c.size
+        X=[x-r,x-r,x+r,x+r,x-r]
+        Y=[y-r,y+r,y+r,y-r,y-r]
+        ax.plot(X,Y)
+    x = goal.loc[0]
+    y = goal.loc[1]
+    r = 0.1
+    X=[x-r,x-r,x+r,x+r,x-r]
+    Y=[y-r,y+r,y+r,y-r,y-r]
+    ax.plot(X,Y)
+    loc = hexpod.loc
+    x = loc[0]
+    y = loc[1]
+    X=[x-r,x-r,x+r,x+r,x-r]
+    Y=[y-r,y+r,y+r,y-r,y-r]
+    ax.plot(X,Y)
+
+
 def simxSynchronousTrigger(ID): # 每一次只在Trigger的时候更新
     pass
 
@@ -389,6 +412,7 @@ def simxGetObjectPosition(ID, obj, cdn, opmod):
         return 1,obj.p
     if(obj == goal):
         return 1,turnVec(obj.loc-cdn.loc,-cdn.ori)
+    return 1,turnVec(obj.loc-cdn.loc,-cdn.ori)
         
 
 def simxSetObjectPosition(ID,obj, cdn, pos ,opmod):
@@ -415,15 +439,12 @@ def robotSetFoot(side, pee, peb):
     print("Begin Set Foot:", side )
     command = "sf "
     args = ["-i=%d" %side]
-    # for i,a in enumerate(["-a","-d","-b","-e","-c","-f"]):
     for i,a in enumerate(["-d","-a","-e","-b","-f","-c"]):
-        # args.append(a+"="+str(pee[i]))
         args.append(a+"="+"%.3f" % -pee[i])
-    for i,a in enumerate(["-j","-g","-h"]):
-        # args.append(a+"="+str(peb[i]))
+    for i,a in enumerate(["-j","-g","-h","-k","-l","-m"]):
         args.append(a+"="+"%.3f" % -peb[i])
-    for i, a in enumerate(["-k","-l","-m"]):
-        args.append(a+"="+"%.3f" % peb[i+3])
+    # for i, a in enumerate(["-k","-l","-m"]):
+    #     args.append(a+"="+"%.3f" % peb[i+3])
     # print(args)
     # time.sleep(5)
     robot.command(command,args)
@@ -441,17 +462,38 @@ def robotSetFoot(side, pee, peb):
         hexpod.tips[i].loc = hexpod.loc + hexpod.toGlob(hexpod.tips[i].p)
 
     hexpod.ori += peb[5]
-        
+    
+    if(DISPLAY_OBS and False):
+        # topoobs = topoObservation()
+        ax.clear()
+        display()
+        # for i in range(6):
+        #     topoobs[int((obs[i]+1)*20)][int((obs[i+1]+1)*20)] = 0.05
+        # ax.imshow(topoobs)
+        # ax.autoscale([-5,5],[-5,5])
+        ax.set_xlim(-1,5)
+        ax.set_ylim(-3,3)
+        fig.canvas.draw()
 
 # def drawPoint(loc):
     
 
-
+if(DISPLAY_OBS and False):
+    fig = plt.figure()
+    ax = fig.gca()
+    # obs = topoObservation()
+    # ax.imshow(obs)
+    display()
+    # ax.autoscale([-5,5],[-5,5])
+    ax.set_xlim(-1,5)
+    ax.set_ylim(-3,3)
+    # fig.canvas.draw()
+    plt.show(block=False) 
 
 
 # fig,ax = plt.subplots(1,1,projection = "3d")
 
-plt.show(block=False)
+
 if __name__ == "__main__":
 
     updateRobotPosition()
