@@ -160,7 +160,7 @@ def three_step_delta(newpos,side,MOD="delta"):
             target[i] += newpos_delta[int(i/2)]
             pee += list(newpos_delta[int(i/2)][:2])
     # # transTo(target)
-    print(pee)
+    # print(pee)
     
     # print(target)
     print(bodyDiffOri(target))

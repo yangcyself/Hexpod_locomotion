@@ -204,54 +204,7 @@ class Hexpod(rep_obj):
         #solve the position of body
 
         # refresh the height
-        if(not self.state):
-            return 
-
-        self.loc_sol = []
-        self.ori_sol = []
-        tmin_loc = 2
-        tmin_t = self.tips[0]
-        for t in self.tips:
-            if(t.fixed()):
-                newloc = t.loc - t.p # as the height has no influence of the ang
-                # if(tmin_loc>t.loc[2]):
-                #     tmin_loc = t.loc[2]
-                #     tmin_t = t
-
-                self.loc_sol.append(newloc)
-
-        #To solve the problem Error: zero-size array to reduction operation maximum which has no identity
-        if(len(self.loc_sol)==0):
-            print("ERROR, self.loc_sol empty \n DATAS: \n")
-            self.printState()
-            #set loc accoring to least leg
-            self.loc_sol.append(tmin_t.loc - tmin_t.p)
-
-        self.loc[2] = np.max(np.array(self.loc_sol),axis=0)[2]
-        for t in self.tips:
-            t.loc[2] = self.loc[2] + t.p[2]
-        # print(self.loc[2])
-        # refresh the ori
-        for t in self.tips:
-            if(t.fixed()):
-                dif_loc = t.loc-self.loc
-                # ori = math.atan2(dif_loc[1],dif_loc[0])-math.atan2(t.p[1],t.p[0])
-                ori = diff_ang(dif_loc,t.p)
-                self.ori_sol.append(ori)
-        self.ori = ave_ang(self.ori_sol)
-
-        # refresh the loc of all nodes
-        self.loc_sol = []
-        for t in self.tips:
-            if(t.fixed()):
-                newloc = t.loc - self.toGlob(t.p)
-                self.loc_sol.append(newloc)
-        self.loc = np.average(np.array(self.loc_sol),axis = 0)
-        
-        for t in self.tips:
-            t.loc = self.loc + self.toGlob(t.p)
-        for t in self.shape_nodes:
-            t.loc = self.loc+ self.toGlob(t.p)
+        pass
     
 
 
@@ -334,7 +287,12 @@ class robot_client:
         # self.command("exit",[])
         self.tctimeClient.close()
 
-robot  = robot_client()
+class fake_robot_client:
+    def command(self,command,args):
+        print(command, " "," ".join(args))
+        return None
+# robot  = robot_client()
+robot  = fake_robot_client()
 
 
 # def collision_check():
@@ -380,6 +338,7 @@ def parsePosition(res):
 
 def updateRobotPosition():
     #hexpod.ori ,loc call slam
+    return
     with open("vec_rot.txt","r") as f:
         # fcntl.flock(f,fcntl.LOCK_EX)
         
@@ -390,19 +349,19 @@ def updateRobotPosition():
             nums = line.split(" ")
         hexpod.loc[0] = -float(nums[2])/100
         hexpod.loc[1] = float(nums[0])/100
-        print("vec_rot:",end = " ")
-        print (nums)
+        # print("vec_rot:",end = " ")
+        # print (nums)
         hexpod.ori = float(nums[4])
         # fcntl.flock(f,fcntl.LOCK_UN)
 
     # for t in hexpod.tips:
 
-    print(hexpod.loc,end = "\t")
+    print("LOC&ORI",hexpod.loc,end = "\t")
     print(hexpod.ori)
     robot.command("gf",[])
     time.sleep(2)
     res = robot.command("gf",["-i=1"])
-    print(res)
+    # print(res)
     assert(res)
 
     parsePosition(res)
@@ -468,6 +427,21 @@ def robotSetFoot(side, pee, peb):
     # print(args)
     # time.sleep(5)
     robot.command(command,args)
+
+
+    # update the loc of the foot and body
+    hexpod.loc += turnVec(np.array(peb[0:3]),hexpod.ori)
+    for t in hexpod.tips:
+        t.p[0] -= peb[0]
+        t.p[1] -= peb[1]
+
+    for i in range(side,6,2):
+        hexpod.tips[i].p[0] += pee[int(i/2)*2]
+        hexpod.tips[i].p[1] += pee[int(i/2)*2+1]
+        hexpod.tips[i].loc = hexpod.loc + hexpod.toGlob(hexpod.tips[i].p)
+
+    hexpod.ori += peb[5]
+        
 
 # def drawPoint(loc):
     
