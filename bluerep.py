@@ -292,8 +292,8 @@ class fake_robot_client:
     def command(self,command,args):
         print(command, " "," ".join(args))
         return None
-# robot  = robot_client()
-robot  = fake_robot_client()
+robot  = robot_client()
+# robot  = fake_robot_client()
 
 
 # def collision_check():

@@ -2,3 +2,7 @@ actorcritic/Models/*
 actorcritic/__pycache__/*
 __pycache__/*
 actorcritic/vec_rot.txt
+actorcritic/logs/logCRAZY.txt
+actorcritic/logs/logTEST.txt
+actorcritic/.ipynb_checkpoints/*checkpoint.ipynb
+.ipynb_checkpoints/*
