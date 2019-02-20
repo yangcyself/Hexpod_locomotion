@@ -24,7 +24,7 @@ def recover(n=N):
     Lz = np.zeros(n+1)
     init_position = np.zeros((6, 3))
     time.sleep(3)
-    vrep.updateRobotPosition()
+    # vrep.updateRobotPosition()
     for i in range(6):
         res, init_position[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(1,n+1):
@@ -69,7 +69,7 @@ def transTo(target,n=N): #TODO: make max step length or
 
     assert(target.shape==(6,3))
     initPos = np.zeros((6, 3))
-    vrep.updateRobotPosition()
+    # vrep.updateRobotPosition()
     for i in range(6):
         res, initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     delta = (target - initPos)/n
@@ -127,7 +127,7 @@ def bodyDiffOri(target):
     basAng = np.array(basAng)*math.pi/6
     for i in range(0,6):
         ang[i] = math.atan2(target[i][1],target[i][0])
-        deg = ave_ang(ang-basAng)
+    deg = ave_ang(ang-basAng)
     return deg
 
 
@@ -140,7 +140,7 @@ def three_step_delta(newpos,side,MOD="delta"):
     assume that the body position is above the middle of the foot (x,y)s.
     """
     initPos = np.zeros((6, 3))
-    vrep.updateRobotPosition()
+    # vrep.updateRobotPosition()
     for i in range(6):
         res, initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     # height = 0.25
@@ -183,7 +183,7 @@ def print_steps():
     import matplotlib.pyplot as plt
     x=[]
     y = []
-    vrep.updateRobotPosition()
+    # vrep.updateRobotPosition()
     for i in range(6):
         res, Pos = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
         x.append(Pos[0])
@@ -200,7 +200,7 @@ def walk_a_step(length=0.3,deg=0):
 
 def turn_a_deg(deg):
     target = np.zeros((3,3))
-    vrep.updateRobotPosition()
+    # vrep.updateRobotPosition()
     for i in range(0,6,2):
         res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(3):
@@ -209,7 +209,7 @@ def turn_a_deg(deg):
         target[i][0] = dist*math.cos(ang+deg)
         target[i][1] = dist*math.sin(ang+deg)
     three_step(target,0)
-    vrep.updateRobotPosition()
+    # vrep.updateRobotPosition()
     for i in range(1,6,2):
         res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(3):

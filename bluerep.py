@@ -461,8 +461,13 @@ def robotSetFoot(side, pee, peb):
         hexpod.tips[i].p[1] += pee[int(i/2)*2+1]
         hexpod.tips[i].loc = hexpod.loc + hexpod.toGlob(hexpod.tips[i].p)
 
+    for t in hexpod.tips:
+        t.p = turnVec(t.p,-peb[5])
+
     hexpod.ori += peb[5]
     
+    updateRobotPosition()
+
     if(DISPLAY_OBS and False):
         # topoobs = topoObservation()
         ax.clear()
