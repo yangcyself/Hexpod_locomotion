@@ -23,7 +23,11 @@ ORIPOS=np.array([[ 5.27530670e-01 , 3.04633737e-01,-5.4652e-01],
         [ 5.27622223e-01 ,-3.04508090e-01,-5.4652e-01],
         [ 1.44958496e-04 ,-6.09171569e-01,-5.4652e-01],
         [-5.27413368e-01 ,-3.04654479e-01,-5.4652e-01]])
+# ORIPOS = ORIPOS.dot(np.array([[1.05,0,0],
+#                                 [0,1.05,0],
+#                                 [0,0,1]]))
 
+print (ORIPOS)
 topolist = []
 
 
@@ -68,8 +72,6 @@ def generate_set_TOPO_util(obj,r,h):
         loc = generateTarget()
         while(loc[0]**2+loc[1]**2<1 or barrier_collision(loc[0],loc[1],r)):
             loc = generateTarget()
-        if(BLUEROBOT):
-            loc = [2,0,0]
         loc[2] = h/2
         vrep.simxSetObjectPosition(clientID, b, -1, loc,
                                vrep.simx_opmode_oneshot_wait)
@@ -204,8 +206,8 @@ def reset():
 
 
     obs = []
-    if(BLUEROBOT):
-        vrep.updateRobotPosition()
+    # if(BLUEROBOT):
+    #     vrep.updateRobotPosition()
     for i in range(6):
         res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)
         loc = list(loc[:-1])
@@ -217,14 +219,14 @@ def reset():
     # loc = list(loc)
     # obs+=loc
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    obs+=list(difftarget)
-    # obs+=list(difftarget[:-1])
+    # obs+=list(difftarget)
+    obs+=list(difftarget[:-1])
     
     obs.append(SIDE)
     dst = distance(obs)
     lastdist = dst
     bestdist = dst
-    assert(len(obs)==16)
+    assert(len(obs)==15)
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
 
@@ -305,8 +307,8 @@ def step(action):
     SIDE = 1-SIDE
     obs = []
 
-    if(BLUEROBOT):
-        vrep.updateRobotPosition()
+    # if(BLUEROBOT):
+    #     vrep.updateRobotPosition()
     for i in range(6):
         res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)       
         loc = list(loc[:-1])
@@ -318,12 +320,12 @@ def step(action):
         done = True
    
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
-    # obs+=list(difftarget[:-1])
-    obs+=list(difftarget)
+    obs+=list(difftarget[:-1])
+    # obs+=list(difftarget)
     print("DIFFTARGET:",difftarget)
 
     obs.append(SIDE)
-    assert(len(obs)==16)
+    assert(len(obs)==15)
     dst = distance(obs)
     # print(dst , bestdist)
     # print("orientation:", obs[-5])
@@ -357,7 +359,7 @@ def step(action):
         obs+= np.random.normal([0]*len(obs),0.01)
         obs = list(obs)
 
-    if(DISPLAY_OBS):
+    if(DISPLAY_OBS ):
         # topoobs = topoObservation()
         ax.clear()
         display()
@@ -381,6 +383,8 @@ target = generateTarget()
 while(target[0]**2+target[1]**2<4):
     target = generateTarget()
 target = [4,0,0.2]
+vrep.simxSetObjectPosition(clientID, goal, -1, target,
+                               vrep.simx_opmode_oneshot_wait)
 lastdist = -1
 bestdist = -1
 
@@ -388,7 +392,7 @@ def mystep(act):
     # act = act.reshape(3,2)
     three_step(act,0)
 
-if(DISPLAY_OBS):
+if(DISPLAY_OBS ):
     fig = plt.figure()
     ax = fig.gca()
     # obs = topoObservation()
@@ -399,6 +403,27 @@ if(DISPLAY_OBS):
     ax.set_ylim(-3,3)
     # fig.canvas.draw()
     plt.show(block=False) 
+
+"""
+interface for tcd easier q learning
+"""
+def fetchKinect(kinect_depth):
+    # res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    # location = loc[:2]
+    # res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    # ori = loc[2]
+    shortestD = 100
+    shortestA = 0
+    for b in Wall:
+        _,loc = vrep.simxGetObjectPosition(clientID,b,BCS,vrep.simx_opmode_oneshot_wait)
+        dis = math.sqrt(loc[0]**2+loc[1]**2) - 0.25
+        if(dis<shortestD):
+            shortestD = dis
+            shortestA = math.atan2(loc[1],loc[0])
+        print("shortestD:",shortestD)
+    return shortestD,shortestA,0
+
+
 
 if __name__ == "__main__":
     # reset()
