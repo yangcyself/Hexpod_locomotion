@@ -7,8 +7,11 @@ env: from lowGait import *
 该文件是利用low level controller 提供的反解功能，通过控制杆长与vrep 交互
 应该打开model3ttt
 
+核心内容 closeLoopSetPos:
+    调用神经网络获取杆长把腿移到目标位置上，为了确保效果，会在腿到了目标位置之前一直重复此操作
+
 可以调用的接口：three_step_delta(newpos_delta,side)
-                three_step(newpos,side)
+            three_step(newpos,side)
             传入的参数都是一个3*3的tensor，一个side取0或1代表哪组腿。
             只是delta是原来腿的位置基础上的差值
             均是以body的位置作为坐标系确定的点
