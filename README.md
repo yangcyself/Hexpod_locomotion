@@ -50,5 +50,5 @@ cd 到actorcritic 文件夹
 
 用python 运行`topomain.py`
 
-###参数配置
+### 参数配置
 见config.py
