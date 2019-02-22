@@ -101,50 +101,42 @@ def transTo(target,n=N): #TODO: make max step length or
         vrep.simxSetObjectPosition(clientID, Tip_target[j], BCS, target[j],vrep.simx_opmode_oneshot_wait)
     vrep.simxSynchronousTrigger(clientID)
 
+basAng = [1,3,5,-1,-3,-5]
+basAng = np.array(basAng)*math.pi/6
 def detork(target):
     """
     make the position have no zhuan dong
     """
-    # dist = np.zeros(6)
     ang = np.zeros(6)
-    basAng = [1,3,5,-1,-3,-5]
-    basAng = np.array(basAng)*math.pi/6
     for i in range(0,6):
-        # dist[i] = math.sqrt(target[i][0]**2+target[i][1]**2)
         ang[i] = math.atan2(target[i][1],target[i][0])
-        
-    # print(ang)
-    # print(np.sum(ang)/6,-ave_ang(ang))
-    # ang-=np.sum(ang)/6
     deg = ave_ang(ang-basAng)
-    # ang -= deg
-    # deg = -ave_ang(ang)
-    # target_ = copy.deepcopy(target)
+    return deg
+def turn_peb(target,deg):
+    """
+    turn the target vector deg
+    """
     for i in range(6):        
-        # target[i][0] = dist[i]*math.cos(ang[i])
-        # target[i][1] = dist[i]*math.sin(ang[i])
-        # print("target_")
-        # print(target_[i])
         target[i] = turnVec(target[i],-deg)
-        # print("target")
-        # print(target[i])
     return target
 
-def three_step_delta(newpos_delta,side):
+def three_step_delta(newpos_delta,side,peb=None):
     """
     newpos is the difference between the new position and the present position of the three peds
     3*3, the z
     side = 0 or 1
-    assume that the body position is above the middle of the foot (x,y)s.
+    when peb is None assume that the body position is above the middle of the foot (x,y)s.
+    peb: shape(2,3) peb[0]: the body target x,y,z position peb[1]: the body oula target angle
     """
     height = 0.25
 
     if(CLIP):
         newpos_delta = np.clip(newpos_delta,-0.1,0.1)
 
-
-    avedelta = np.sum(newpos_delta,axis=0)/6 
-
+    if(peb is None):
+        avedelta = np.sum(newpos_delta,axis=0)/6 
+    else:
+        avedelta = peb[0]
     #lift up:
     initPos = np.zeros((6, 3))
     for i in range(6):
@@ -159,16 +151,18 @@ def three_step_delta(newpos_delta,side):
     for i in range(6):
         if(i%2==side):
             target[i] += newpos_delta[int(i/2)]
-    target = detork(target)
+    if(peb  is None):
+        deg = detork(target)
+    else:
+        deg = peb[1][2]
+    target = turn_peb(target,deg)
     transTo(target)
     for i in range(6):
         if(i%2==side):
             target[i][2] -=height
-    target_sum = np.sum(target,axis=0)/6
-    target_sum[2] = 0
-    target-=target_sum
-    target = detork(target)
     transTo(target)
+    #--------------------
+    # Triangle Gait
     # avedelta = np.sum(newpos_delta,axis=0)/6 
 
     #lift up:
@@ -196,11 +190,16 @@ def three_step_delta(newpos_delta,side):
     # transTo(target)
 
 def three_step(newpos,side):
-
+    """
+    newpos如果shape是（5,3）的话，意味着后面还有peb
+    """
     initPos = np.zeros((3, 3))
     for i in range(side,6,2):
         res,initPos[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-    three_step_delta(newpos-initPos,side)
+    if(newpos.shape==(3,3)):
+        three_step_delta(newpos[:3]-initPos,side)
+    else:
+        three_step_delta(newpos[:3]-initPos,side,newpos[3:])
 
 def print_steps():
     import matplotlib.pyplot as plt
@@ -214,31 +213,21 @@ def print_steps():
     plt.show()
 
 
-def walk_a_step(length=0.3,deg=0):
+def walk_a_step(length=0.3,deg=0,peb=None):
     x = length*math.cos(deg)
     y = length*math.sin(deg)
-    three_step_delta(np.array([[x,y,0] for i in range(3)]),0)
-    three_step_delta(np.array([[x,y,0] for i in range(3)]),1)
+    peb = peb/2
+    three_step_delta(np.array([[x,y,0] for i in range(3)]),0,peb)
+    three_step_delta(np.array([[x,y,0] for i in range(3)]),1,peb)
 
 def turn_a_deg(deg):
     target = np.zeros((3,3))
-    for i in range(0,6,2):
-        res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-    for i in range(3):
-        dist = math.sqrt(target[i][0]**2+target[i][1]**2)
-        ang = math.atan2(target[i][1],target[i][0])
-        target[i][0] = dist*math.cos(ang+deg)
-        target[i][1] = dist*math.sin(ang+deg)
-    three_step(target,0)
-    
-    for i in range(1,6,2):
-        res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-    for i in range(3):
-        dist = math.sqrt(target[i][0]**2+target[i][1]**2)
-        ang = math.atan2(target[i][1],target[i][0])
-        target[i][0] = dist*math.cos(ang+deg)
-        target[i][1] = dist*math.sin(ang+deg)
-    three_step(target,1)
+    for step in range(2):
+        for i in range(step,6,2):
+            res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
+        for i in range(3):
+            target[i] = turnVec(target[i],deg)
+        three_step(target,step)
 
 
 
@@ -322,7 +311,15 @@ if clientID!=-1:
 if __name__=="__main__":
     #test
     recover( n=min(N,30))
-    walk_a_step(0.3,math.pi/2)
+    # walk_a_step(0.3,math.pi/2,np.array([[0,0,0],[0,0,0]]))
+    # walk_a_step(0.3,0,np.array([[0,0,0],[0,0,0]]))
+    
+
+
+    turn_a_deg(0.5)
+    turn_a_deg(0.5)
+    turn_a_deg(0.5)
+    turn_a_deg(0.5)
     turn_a_deg(0.5)
     # three_step(np.array([[-0.01539664 ,-0.07759521  ,0.        ],
     #                 [-0.09819948 ,-0.05909955  ,0.        ],
