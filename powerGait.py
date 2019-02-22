@@ -129,7 +129,6 @@ def three_step_delta(newpos_delta,side,peb=None):
     peb: shape(2,3) peb[0]: the body target x,y,z position peb[1]: the body oula target angle
     """
     height = 0.25
-
     if(CLIP):
         newpos_delta = np.clip(newpos_delta,-0.1,0.1)
 
@@ -216,18 +215,24 @@ def print_steps():
 def walk_a_step(length=0.3,deg=0,peb=None):
     x = length*math.cos(deg)
     y = length*math.sin(deg)
-    peb = peb/2
+    if(peb is not None):
+        peb = peb/2
     three_step_delta(np.array([[x,y,0] for i in range(3)]),0,peb)
     three_step_delta(np.array([[x,y,0] for i in range(3)]),1,peb)
 
-def turn_a_deg(deg):
+def turn_a_deg(deg,peb = None):
     target = np.zeros((3,3))
+    if(peb is not None):
+        peb = peb/2
     for step in range(2):
         for i in range(step,6,2):
             res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
         for i in range(3):
             target[i] = turnVec(target[i],deg)
+        if(peb is not None):
+            target = np.concatenate((target,peb))
         three_step(target,step)
+
 
 
 
@@ -312,15 +317,13 @@ if __name__=="__main__":
     #test
     recover( n=min(N,30))
     # walk_a_step(0.3,math.pi/2,np.array([[0,0,0],[0,0,0]]))
-    # walk_a_step(0.3,0,np.array([[0,0,0],[0,0,0]]))
+    walk_a_step(0.3,0,np.array([[0.3,0,0],[0,0,0]]))
     
 
 
-    turn_a_deg(0.5)
-    turn_a_deg(0.5)
-    turn_a_deg(0.5)
-    turn_a_deg(0.5)
-    turn_a_deg(0.5)
+    turn_a_deg(0.2,peb=np.array([[0,0,0],[0,0,0.2]]))
+
+    
     # three_step(np.array([[-0.01539664 ,-0.07759521  ,0.        ],
     #                 [-0.09819948 ,-0.05909955  ,0.        ],
     #                 [ 0.10317233 ,-0.05715271  ,0.        ]]),0)
