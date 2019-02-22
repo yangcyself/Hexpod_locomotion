@@ -27,20 +27,23 @@ class FCnet(nn.Module):
         outputsize = 3
         hidden_dim1 = 128
         hidden_dim2 = 128
+        hidden_dim3 = 128
         self.fc1 = nn.Linear(inputsize,hidden_dim1)
         self.fc2 = nn.Linear(hidden_dim1,hidden_dim2)
-        self.fc3  =nn.Linear(hidden_dim2,outputsize)
+        self.fc3  =nn.Linear(hidden_dim2,hidden_dim3)
+        self.fc4  =nn.Linear(hidden_dim3,outputsize)
         self.tanh = nn.Tanh()
-        
+
     def forward(self,x):
         hidden1 = self.tanh(self.fc1(x))
         hidden2 = self.tanh(self.fc2(hidden1))
-        out = self.tanh(self.fc3(hidden2))
+        hidden3 = self.tanh(self.fc3(hidden2))
+        out = self.tanh(self.fc4(hidden3))
         out = out  #[-0.05,0.05] 精度能保证到小数点后面三个0
         return out
 
 class MyDataset(torch.utils.data.Dataset):
-    
+
     def create_dataset(self, datasets):
         dataX = []
         dataY = []
@@ -117,7 +120,7 @@ if __name__ == "__main__":
     optimizer = optim.SGD(fc.parameters(), lr=0.0001, momentum=0.02,weight_decay=0.0000005)
     batch_size = 50
     # train
-    train_epoch = 400
+    train_epoch = 10000
     logger = Logger("./logs")
     dts = []
     for i in range(3,10):
@@ -131,14 +134,15 @@ if __name__ == "__main__":
     # print(train_dataset[0])
     train_dataloader = DataLoader(
         train_dataset,
-        batch_size=batch_size, 
+        batch_size=batch_size,
         shuffle=True,
     )
-    
-    for epoch in range(train_epoch): 
+
+    for epoch in range(train_epoch):
         fc.train()
         print("epoch:", epoch)
         for step, input_data in enumerate(train_dataloader):
+
             # print (input_data)
             # break
             x, y = input_data
@@ -146,13 +150,13 @@ if __name__ == "__main__":
 
             x = x.to(device).float()
             y = y.to(device).float()
-            
+
             pred_y = fc(x)
 
             loss = loss_F(pred_y, y) # 计算loss
-            
-            if step %50 == 49: # 每50步，计算精度
-                
+
+            if step %10 == 0: # 每50步，计算精度
+
                 print("{}/{} steps".format(step, len(train_dataloader)), float(loss))
                 info = { 'loss': float(loss)}
                 for tag, value in info.items():
@@ -163,6 +167,5 @@ if __name__ == "__main__":
             optimizer.step()
     print("SAVED! ", 'firstshot4.pt')
     torch.save(fc.state_dict(), 'firstshot4.pt')
-
 
 fc = footControler("firstshot4.pt")
