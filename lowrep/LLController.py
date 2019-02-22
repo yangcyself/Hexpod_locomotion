@@ -113,7 +113,8 @@ if __name__ == "__main__":
     # use_cuda = False
     device = torch.device("cuda" if use_cuda else "cpu")
     fc = FCnet().to(device)
-    optimizer = optim.SGD(fc.parameters(), lr=0.0001, momentum=0.2,weight_decay=0.00005)
+    # optimizer = optim.SGD(fc.parameters(), lr=0.0001, momentum=0.2,weight_decay=0.00005)
+    optimizer = optim.SGD(fc.parameters(), lr=0.0001, momentum=0.02,weight_decay=0.0000005)
     batch_size = 50
     # train
     train_epoch = 400
