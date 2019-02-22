@@ -34,7 +34,7 @@ env: from lowGait import *
 import sys
 sys.path.append("../")
 import vrep
-N=3
+N=2
 import numpy as np
 import math
 import time
@@ -109,26 +109,30 @@ def setleglength(n,l):
 
 def closeLoopSetPos(target):
     assert(target.shape == (6,3))
-    threshold = 0.005
+    threshold = 0.01
     initPos = np.zeros((6, 3))
     for i in range(6):
         _,initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     delta = target - initPos
-    delta[abs(delta) < threshold] = 0
-    while(np.sum(abs(delta))!=0):
-        print(delta)
+    z_delta = np.copy(delta)
+    z_delta[abs(delta) < threshold] = 0
+    while(np.sum(abs(z_delta))!=0):
+        # print(delta)
         for i in range(6):
+            if(np.sum(abs(z_delta[i]))==0):
+                continue
             leglength=getleglength(i)
             pos = llc.querry(np.concatenate((leglength,delta[i])),i)
-            if(i==0):
-                print(pos)
+            # if(i==0):
+                # print(pos)
             setleglength(i,leglength + pos) # I just don't know why it should be minus
-        time.sleep(2)
+        time.sleep(0.1)
         for i in range(6):
             _,initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
         delta = target - initPos
-        delta[abs(delta) < threshold] = 0
-    
+        z_delta = np.copy(delta)
+        z_delta[abs(delta) < threshold] = 0
+    print("Finished")
 
 
 def transTo(target,n=N): #TODO: make max step length or 
@@ -186,7 +190,7 @@ def three_step_delta(newpos_delta,side):
     side = 0 or 1
     assume that the body position is above the middle of the foot (x,y)s.
     """
-    height = 0.25
+    height = 0.1
     avedelta = np.sum(newpos_delta,axis=0)/6 
 
     #lift up:
