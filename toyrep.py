@@ -421,6 +421,7 @@ class Hexpod(rep_obj):
                     print("FOOT %d TOO Short or Long" %i)
                     self.printState()
                     self.explode()
+                    break
 
 
 

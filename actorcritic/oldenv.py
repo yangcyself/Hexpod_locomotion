@@ -308,7 +308,7 @@ def torque(obs):
     for i in range(0,18,3):
         ang[int(i/3)] = math.atan2(obs[i+1],obs[i])
     deg = ave_ang(ang-basAng)
-    return 1000*deg**3
+    return -100*deg**3
 rewardItems.append((torque,RWD_TORQUE,RWDFAC_TORQUE,"torque"))
 
 def display():
@@ -401,9 +401,6 @@ def step(action):
     if(dst < 0.5):
         reward  =20
         done = True
-    if(dst > 15):
-        reward -= 20
-        done = True
     
     tlogger.dist["rewardFunc"] = tlogger.dist.get("rewardFunc",0)+reward
     if(not done):
@@ -412,7 +409,7 @@ def step(action):
                 r  = fac * item(obs)
                 reward += r
                 tlogger.dist[nam] = tlogger.dist.get(nam,0)+r
-    # print(reward)
+    print(reward)
 
     info = None
 
