@@ -30,13 +30,17 @@ MAX_TOTAL_REWARD = 300
 # A_DIM = env.action_space.shape[0]
 # A_MAX = env.action_space.high[0]
 
-S_DIM = 1615 #1600 + 160 + 15
+S_DIM = 24 #1600 + 15
+if(OBSERVETOPO):
+    S_DIM += 1600
 if(FUTHERTOPO):
     S_DIM += 144
-A_DIM = 6
+
+A_DIM = 12
 # A_MAX = 0.3
 # A_MAX = 0.25
-A_MAX = 0.09
+# A_MAX = 0.09 #
+A_MAX = np.array([0.1]*6+[0.15]*2+[0.1]+[0]*2+[0.3])
 
 
 print (' State Dimensions :- ', S_DIM)
@@ -56,8 +60,11 @@ def main():
     averagetotoal_reward = 0
     # MAX_EPISODES = 3
     for _ep in range(1,MAX_EPISODES):
-        (obs,tpo) = env.reset()
-        observation = obs+list(tpo.reshape(-1,))
+        if(OBSERVETOPO):
+            (obs,tpo) = env.reset()
+            observation = obs+list(tpo.reshape(-1,))
+        else:
+            observation = env.reset()
         # _ep = _ep+RESUME
         print("last total reward:", total_reward)
         averagetotoal_reward += total_reward
@@ -73,9 +80,12 @@ def main():
                 action = trainer.get_exploration_action(state)
 
             # new_observation, reward, done, info = env.step(action)
-            (obs,tpo), reward, done, info = env.step(action)
+            if(OBSERVETOPO):
+                (obs,tpo), reward, done, info = env.step(action)
+                new_observation = obs+list(tpo.reshape(-1,))
+            else:
+                new_observation, reward, done, info = env.step(action)
             total_reward += reward
-            new_observation = obs+list(tpo.reshape(-1,))
 
             if done:
                 new_state = None
@@ -107,9 +117,6 @@ def main():
 
             averagetotoal_reward = 0
 
-        if(BLUEROBOT):
-            break
-        break
     print ('Completed episodes')
 
 def getnumber(name):

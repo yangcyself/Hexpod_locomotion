@@ -27,7 +27,7 @@ import numpy as np
 import time
 from actorcritic.config import *
 from actorcritic import Tlogger
-
+from actorcritic.terrianMap import heightMap
 
 WORLD_SIZE = [-5,5]
 
@@ -38,6 +38,7 @@ tlogger = Tlogger
 print(tlogger)
 #whether make sure that the body position is near the middle of the fixed legs
 
+terrianContactBallheight = 0.025
 
 # DISPLAY = True
 
@@ -58,7 +59,9 @@ def topology(x,y):
             if(abs(x-f.x)<=f.r):
                 return f.h
         return 0
-    height = 0
+    
+    # height = 0
+    height = heightMap(x,y)
     for c in CLDS:
         if((x-c.loc[0])**2+(y-c.loc[1])**2<= c.size**2):
             height = max(height,c.size)
@@ -96,10 +99,6 @@ def ave_ang(angs):
     y = np.sin(angs)
     return math.atan2(np.sum(y),np.sum(x))
 
-    
-
-
-
 class rep_obj:
     def __init__(self,name,parent):
         if(type(name)!=list):
@@ -127,14 +126,16 @@ class Botnode(rep_obj):
         self.state = True
 
     def fixed(self):
-        return self.loc[2] <= TOPO(self.loc[0],self.loc[1])+0.005
+        return self.loc[2] <= TOPO(self.loc[0],self.loc[1]) + 0.005 + terrianContactBallheight
+
+basAng = [1,3,5,-1,-3,-5]
+basAng = np.array(basAng)*math.pi/6
+
 
 class Hexpod(rep_obj):
     def __init__(self,reset = False):
-        # self.bodyp = Botnode([0,0,0.6])
-        # self.bodyo = 0 #orientation
         self.ori = 0
-        height = 4.4652e-01
+        height = 4.4652e-01  +terrianContactBallheight
         self.loc = np.array([0,0,height])
         if(not reset):
             self.loc_sol = [] # the location get solving one constraints, for debugging
@@ -279,35 +280,27 @@ class Hexpod(rep_obj):
 
         self.loc_sol = []
         self.ori_sol = []
-        tmin_loc = 2
-        tmin_t = self.tips[0]
         for t in self.tips:
             if(t.fixed()):
                 newloc = t.loc - t.p # as the height has no influence of the ang
-                # if(tmin_loc>t.loc[2]):
-                #     tmin_loc = t.loc[2]
-                #     tmin_t = t
-
                 self.loc_sol.append(newloc)
 
         #To solve the problem Error: zero-size array to reduction operation maximum which has no identity
         if(len(self.loc_sol)==0):
             print("ERROR, self.loc_sol empty \n DATAS: \n")
             self.printState()
-            # #set loc accoring to least leg
-            # self.loc_sol.append(tmin_t.loc - tmin_t.p)
             self.explode()
             return
 
+        
         self.loc[2] = np.max(np.array(self.loc_sol),axis=0)[2]
         for t in self.tips:
             t.loc[2] = self.loc[2] + t.p[2]
-        # print(self.loc[2])
+
         # refresh the ori
         for t in self.tips:
             if(t.fixed()):
                 dif_loc = t.loc-self.loc
-                # ori = math.atan2(dif_loc[1],dif_loc[0])-math.atan2(t.p[1],t.p[0])
                 ori = diff_ang(dif_loc,t.p)
                 self.ori_sol.append(ori)
         self.ori = ave_ang(self.ori_sol)
@@ -411,6 +404,25 @@ class Hexpod(rep_obj):
                     self.printState()
                     self.explode()
                     break
+    
+        if(SAFE_ANGLE):
+            ang = np.zeros(6)
+            for i in range(0,6):
+                ang[i] = math.atan2(self.tips[i].p[1],self.tips[i].p[0])
+            deg = ave_ang(ang-basAng)
+            if(abs(deg)>0.8):
+                print("BODY TORCK")
+                self.printState()
+                self.explode()
+
+        if(FOOTRANGE):
+            for i,t in enumerate(self.tips):
+                if(not (FOOTRANGE[0] <np.sum(t.p**2) < FOOTRANGE[1] )):
+                    print("FOOT %d TOO Short or Long" %i)
+                    self.printState()
+                    self.explode()
+
+
 
 class Goal(rep_obj):
     def __init__(self):
@@ -535,13 +547,11 @@ def simxGetObjectHandle(ID,name,opmod):
     return 1,NAME.get(name,-2)
 
 def simxGetObjectPosition(ID, obj, cdn, opmod):
-
     obj = HANDLE[obj]
     if(not obj.state):
         a = np.empty((3,))
         a[:] = np.nan
         return 1, a
-
     if(cdn==-1):
         return 1, obj.loc
     cdn = HANDLE[cdn]
@@ -552,7 +562,7 @@ def simxGetObjectPosition(ID, obj, cdn, opmod):
 def simxSetObjectPosition(ID,obj, cdn, pos ,opmod):
     obj = HANDLE[obj]
     if(not obj.state):
-        return 1
+        return 0
     if(cdn==-1):
         obj.loc = np.array(pos)
         return 1

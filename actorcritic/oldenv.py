@@ -109,8 +109,10 @@ def set_map_util(obj,r,h,pos):
         topolist.append((loc[0],loc[1],r,h))
 
 def set_map():
-    set_map_util(Barrier,0.05,0.1,[[1,0,0.05]]*12)
-    set_map_util(Wall,0.25,0.5,[[2,0,0.25]]*6)
+    # set_map_util(Barrier,0.05,0.1,[[1,0,0.05]]*12)
+    # set_map_util(Wall,0.25,0.5,[[2,0,0.25]]*6)
+    set_map_util(Barrier,0.05,0.1,[[5,0,0.05]]*12)
+    set_map_util(Wall,0.25,0.5,[[5,0,0.25]]*6)
 
 
 def topoObservation():
@@ -265,6 +267,51 @@ def dangerous(obs):
     return rwd
 rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
 
+def balance(obs):
+    #在这一步起始和结束的balance
+    rwd = 0
+    tiploc = np.zeros((6,2))
+    for i in range(6):
+        _, loc = vrep.simxGetObjectPosition(clientID,S1[i],-1,vrep.simx_opmode_oneshot_wait)       
+        tiploc[i] = np.array(loc)[:2]
+    _,loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)       
+    tiploc = tiploc - np.array(loc[:2])
+
+    for side in range(2):
+        sidetiploc = tiploc[[i for i in range(side,6,2)]]
+        deltaloc = np.average(sidetiploc,axis=0)
+        sidetiploc  = sidetiploc - deltaloc #得到以足尖几何中心为0点的三个角的坐标
+        #通过三个单位向量相乘，判断是在哪两个角之间
+        tiplen = np.sqrt(np.sum((sidetiploc**2),axis = 1)).reshape(3,1)
+        sideunittip = sidetiploc / np.concatenate((tiplen,tiplen),axis=1)
+        sideProjection = sideunittip.dot(-deltaloc)
+        sideSect = np.ones((3,))
+        sideSect[np.argmin(sideProjection)] = 0
+        if(sideSect[0]==0):
+            sideSect[1] = -1
+            selected = 1
+        else:
+            sideSect[0] =-1
+            selected = 0
+        Triangleside = sideSect.dot(sidetiploc)
+        inwardScore = abs(np.cross(Triangleside,deltaloc)/np.cross(sidetiploc[selected],Triangleside))
+        # print(Triangleside)
+        # print(sidetiploc)
+        # print(deltaloc)
+        # print(inwardScore)
+        if (inwardScore > 0.3):
+            rwd -= 10*inwardScore**2
+    return rwd
+
+rewardItems.append((balance,RWD_BALANCE,RWDFAC_BALANCE,"balance"))
+
+def torque(obs):
+    ang = np.zeros(6)
+    for i in range(0,18,3):
+        ang[int(i/3)] = math.atan2(obs[i+1],obs[i])
+    deg = ave_ang(ang-basAng)
+    return 1000*deg**3
+rewardItems.append((torque,RWD_TORQUE,RWDFAC_TORQUE,"torque"))
 
 def display():
     for x,y,r,h in topolist:
@@ -312,7 +359,7 @@ def step(action):
     for i in range(3):
         glopee = turnVec(pee[i],bodyori[2]) + np.array(bodypos)
         pee[i][2] = heightMap(glopee[0],glopee[1]) - bodypos[2] + 0.025# 0.025 is the height of the foot 
-        # print(pee[i][2])
+
     
     three_step(np.concatenate((pee,peb)),SIDE)
 
@@ -361,11 +408,12 @@ def step(action):
         done = True
     
     tlogger.dist["rewardFunc"] = tlogger.dist.get("rewardFunc",0)+reward
-    for item, flag,fac,nam in rewardItems:
-        if(flag):
-            r  = fac * item(obs)
-            reward += r
-            tlogger.dist[nam] = tlogger.dist.get(nam,0)+r
+    if(not done):
+        for item, flag,fac,nam in rewardItems:
+            if(flag):
+                r  = fac * item(obs)
+                reward += r
+                tlogger.dist[nam] = tlogger.dist.get(nam,0)+r
     # print(reward)
 
     info = None
