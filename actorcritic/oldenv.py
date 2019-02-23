@@ -37,7 +37,6 @@ def generateTarget():
     loc = (loc-0.5)*10
     loc = np.append(loc ,[0.2])
     loc = list(loc)
-    # loc = np.array([5,0,0.67])
     return loc
 
 
@@ -172,7 +171,7 @@ def distance(obs):
     dst = 0
     for i in range(2):
         # dst += (obs[i+18]-obs[i+24])**2 
-        dst += obs[i+12]**2
+        dst += obs[i+21]**2
     return math.sqrt(dst)
 
 def reset():
@@ -203,7 +202,6 @@ def reset():
 
         target = list(target)
         
-        target = [1,0,0.2]
         vrep.simxSetObjectPosition(clientID, goal, -1, target,
                                vrep.simx_opmode_oneshot_wait)
 
@@ -445,12 +443,7 @@ def step(action):
 
 
 running  = False
-target = generateTarget()
-while(target[0]**2+target[1]**2<4):
-    target = generateTarget()
-target = [4,0,0.2]
-vrep.simxSetObjectPosition(clientID, goal, -1, target,
-                               vrep.simx_opmode_oneshot_wait)
+
 lastdist = -1
 bestdist = -1
 
