@@ -246,24 +246,26 @@ rewardItems = []
 def legPainful(obs):
     rwd = 0
     for i in range(6):
-        pain  = obs[2*i+0]**2+obs[2*i+1]**2 - 0.5
-        if(pain>0):
-            rwd -= pain
+        # pain  = obs[3*i+0]**2+obs[3*i+1]**2 - 0.5
+        # if(pain>0):
+        #     rwd -= pain
+        pain = (obs[3*i+0]**2+obs[3*i+1]**2+obs[3*i+2]**2 - 0.66) # 0.66 is the square sum of [5.27530670e-01 ,3.04633737e-01 ,-5.4652e-01]
+        rwd -= 10*pain**2
     return rwd
 rewardItems.append((legPainful,RWD_PAIN,RWDFAC_PAIN,"pain"))
 
 
-def dangerous(obs):
-    threshold = 0.6
-    rwd = 0
-    X,Y = obs[12],obs[13]
-    for x,y,r,h in topolist:
-        if(h<0.3):
-            continue
-        danger = min(0,math.sqrt((x-X)**2+(y-Y)**2)-threshold)
-        rwd -= danger**2
-    return rwd
-rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
+# def dangerous(obs):
+#     threshold = 0.6
+#     rwd = 0
+#     X,Y = obs[12],obs[13]
+#     for x,y,r,h in topolist:
+#         if(h<0.3):
+#             continue
+#         danger = min(0,math.sqrt((x-X)**2+(y-Y)**2)-threshold)
+#         rwd -= danger**2
+#     return rwd
+# rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
 
 def balance(obs):
     #在这一步起始和结束的balance
@@ -409,6 +411,9 @@ def step(action):
                 r  = fac * item(obs)
                 reward += r
                 tlogger.dist[nam] = tlogger.dist.get(nam,0)+r
+
+    if POSITIVEREWARD and not done:
+        reward = math.exp(reward)
     print(reward)
 
     info = None
@@ -432,6 +437,8 @@ def step(action):
         ax.set_xlim(-1,5)
         ax.set_ylim(-3,3)
         fig.canvas.draw()
+
+
 
     if(OBSERVETOPO):
         return (obs,topoObservation()) ,reward, done, info

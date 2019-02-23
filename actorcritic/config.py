@@ -21,10 +21,10 @@ SETMAP = False       #是否把地图设置成目标地图，用于blue
 CLIP = False         #是否设定一个迈步长度的最大值，用于blue
 LARGEMODEL = False   #使用大模型
 
-
+POSITIVEREWARD = True #这样取一个e，可以让agent尽量学会存活 想法：curriculum学习是不是应该出了常更换任务之外还要常更换critic
 
 #Configues for topomain
-RESUME = 0      #使用哪个模型
+RESUME = 0          #使用哪个模型
 # RESUME = 3400
 # RESUME = "hopior/22000"
 LOGGING = False     #记录tensorboard以及我的textlogger
@@ -50,13 +50,13 @@ FCNTL = platform.system()=="Linux"
 
 #Reward Options:
 RWD_PAIN = True         #腿过长penalty
-RWD_DANEROUS = False    #离障碍太近 penalty
+RWD_DANEROUS = False    #离障碍太近 penalty #已删除
 RWD_BALANCE = True
 RWD_TORQUE = True
 
 
 #Reward factors:
-RWDFAC_PAIN = 0.01
+RWDFAC_PAIN = 0.1
 RWDFAC_DANEROUS = 1
 RWDFAC_BALANCE = 1
 RWDFAC_TORQUE = 1
