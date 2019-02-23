@@ -12,6 +12,7 @@ from torch.autograd import Variable
 from trpo.trpo import trpo_step
 from trpo.utils import *
 from config import *
+from logger import Logger,Tlogger
 import oldenv as env
 
 torch.utils.backcompat.broadcast_warning.enabled = True
@@ -152,7 +153,7 @@ if(RESUME):
     value_net.load_state_dict(torch.load('./Models/' + str(RESUME) + '_critic.pt'))
 
 
-
+logger = Logger("./logs")
 
 for i_episode in count(1):
     memory = Memory()
@@ -174,7 +175,6 @@ for i_episode in count(1):
             action = action.data[0].numpy()
             print("reward_sum:",reward_sum)
             next_state, reward, done, _ = env.step(action)
-            reward *= 100
             reward_sum += reward
             next_state = np.array(next_state)
             # next_state = running_state(next_state)
@@ -203,7 +203,11 @@ for i_episode in count(1):
     if i_episode % args.log_interval == 0:
         print('Episode {}\tLast reward: {}\tAverage reward {:.2f}'.format(
             i_episode, reward_sum, reward_batch))
-    
+
+        info = { 'Average reward': reward_batch}
+        for tag, value in info.items():
+            logger.scalar_summary(tag, value, _ep)
+
         torch.save(policy_net.state_dict(), './Models/' + str(i_episode) + '_actor.pt')
         torch.save(value_net.state_dict(), './Models/' + str(i_episode) + '_critic.pt')
         print ('Models saved successfully')
