@@ -13,6 +13,7 @@ tlogger = Tlogger
 print(tlogger)
 
 import matplotlib.pyplot as plt
+from terrianMap import heightMap
 SIDE = 0
 PAIN_GAMMA = 1
 
@@ -209,15 +210,17 @@ def reset():
     # if(BLUEROBOT):
     #     vrep.updateRobotPosition()
     for i in range(6):
-        res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)
-        loc = list(loc[:-1])
-        obs+=loc
+        _, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)       
+        loc = list(loc)
+        obs+=loc #foot tip BCS xyz
+        
+
     # res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
     # loc = list(loc)
     # obs+=loc
-    # res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
-    # loc = list(loc)
-    # obs+=loc
+    res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    loc = list(loc)
+    obs+=loc
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
     # obs+=list(difftarget)
     obs+=list(difftarget[:-1])
@@ -226,7 +229,7 @@ def reset():
     dst = distance(obs)
     lastdist = dst
     bestdist = dst
-    assert(len(obs)==15)
+    assert(len(obs)==24)
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
 
@@ -292,16 +295,26 @@ def step(action):
     reward = 0
     done = False
     assert (lastdist>0)
-    assert (len(action) ==6)
+    assert (len(action) == 12)
     
     oriPos = ORIPOS[[a for a in range(SIDE,6,2)]]
-    action = action.reshape(3,2)
+    peb = action[6:]
+    peb = peb.reshape(2,3)
+    action = action[:6].reshape(3,2)
     newaction = np.concatenate((action,np.zeros((3,1))),axis = 1)
     assert(newaction.shape==(3,3))
     if(NOISE):
         newaction+=np.random.normal(np.zeros_like(newaction),0.01)
+    pee = oriPos+newaction
 
-    three_step(oriPos+newaction,SIDE)
+    _, bodypos = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    _, bodyori = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    for i in range(3):
+        glopee = turnVec(pee[i],bodyori[2]) + np.array(bodypos)
+        pee[i][2] = heightMap(glopee[0],glopee[1]) - bodypos[2] + 0.025# 0.025 is the height of the foot 
+        # print(pee[i][2])
+    
+    three_step(np.concatenate((pee,peb)),SIDE)
 
     # three_step(np.zeros((3,3)),0)
     SIDE = 1-SIDE
@@ -309,23 +322,28 @@ def step(action):
 
     # if(BLUEROBOT):
     #     vrep.updateRobotPosition()
-    for i in range(6):
-        res, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)       
-        loc = list(loc[:-1])
-        obs+=loc
-    res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
-    if(loc[2]<0.05 or np.isnan(loc[2]) or abs(loc[2])>1e+10):
+    res, bdloc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    if(bdloc[2]<0.05 or np.isnan(bdloc[2]) or abs(bdloc[2])>1e+10):
         reward =-20
         print("@@@@@@ E X P L O D E @@@@@@")
         done = True
-   
+    
+    for i in range(6):
+        _, loc = vrep.simxGetObjectPosition(clientID,S1[i],BCS,vrep.simx_opmode_oneshot_wait)       
+        loc = list(loc)
+        obs+=loc #foot tip BCS xyz
+
+    res, loc = vrep.simxGetObjectOrientation (clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    loc = list(loc)
+    obs+=loc
+
     res , difftarget = vrep.simxGetObjectPosition (clientID,goal,BCS,vrep.simx_opmode_oneshot_wait)
     obs+=list(difftarget[:-1])
     # obs+=list(difftarget)
     print("DIFFTARGET:",difftarget)
 
     obs.append(SIDE)
-    assert(len(obs)==15)
+    assert(len(obs)==24)
     dst = distance(obs)
     # print(dst , bestdist)
     # print("orientation:", obs[-5])

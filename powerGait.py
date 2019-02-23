@@ -11,7 +11,7 @@ import math
 import time
 import copy
 """
-可以调用的接口：three_step_delta(newpos_delta,side)
+可以调用的接口：three_step_delta(newpos_delta,side,peb)
                 three_step(newpos,side)
             传入的参数都是一个3*3的tensor，一个side取0或1代表哪组腿。
             只是delta是原来腿的位置基础上的差值
