@@ -28,7 +28,14 @@ ORIPOS=np.array([[ 5.27530670e-01 , 3.04633737e-01,-5.4652e-01],
 #                                 [0,1.05,0],
 #                                 [0,0,1]]))
 
-print (ORIPOS)
+class observation_space:
+    shape = (24,)
+
+class action_space:
+    shape = (12,)
+    high = 0.1
+
+
 topolist = []
 
 
@@ -229,7 +236,7 @@ def reset():
     dst = distance(obs)
     lastdist = dst
     bestdist = dst
-    assert(len(obs)==24)
+    assert(len(obs)==observation_space.shape[0])
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
 
@@ -250,7 +257,7 @@ def legPainful(obs):
         # if(pain>0):
         #     rwd -= pain
         pain = (obs[3*i+0]**2+obs[3*i+1]**2+obs[3*i+2]**2 - 0.66) # 0.66 is the square sum of [5.27530670e-01 ,3.04633737e-01 ,-5.4652e-01]
-        rwd -= 10*pain**2
+        rwd -= pain**2
     return rwd
 rewardItems.append((legPainful,RWD_PAIN,RWDFAC_PAIN,"pain"))
 
@@ -342,7 +349,7 @@ def step(action):
     reward = 0
     done = False
     assert (lastdist>0)
-    assert (len(action) == 12)
+    assert (len(action) == action_space.shape[0])
     
     oriPos = ORIPOS[[a for a in range(SIDE,6,2)]]
     peb = action[6:]
@@ -390,7 +397,7 @@ def step(action):
     print("DIFFTARGET:",difftarget)
 
     obs.append(SIDE)
-    assert(len(obs)==24)
+    assert(len(obs)==observation_space.shape[0])
     dst = distance(obs)
     # print(dst , bestdist)
     # print("orientation:", obs[-5])
