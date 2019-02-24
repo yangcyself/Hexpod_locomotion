@@ -39,7 +39,7 @@ parser.add_argument('--batch-size', type=int, default=1500, metavar='N',
                     help='random seed (default: 1)')
 parser.add_argument('--render', action='store_true',
                     help='render the environment')
-parser.add_argument('--log-interval', type=int, default=100, metavar='N',
+parser.add_argument('--log-interval', type=int, default=4, metavar='N',
                     help='interval between training status logs (default: 10)')
 args = parser.parse_args()
 

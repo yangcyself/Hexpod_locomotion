@@ -24,6 +24,7 @@ scale_y = img.shape[0]/len_y
 #     return np.sum(img[int(mid_x + x*scale_x) ][int(mid_y-y*scale_y)])/3
 
 def heightMap(x,y):
+    return 0
     if(0.6<x<1.6 and -0.5<y<0.5):
         return 0.1
     return 0
