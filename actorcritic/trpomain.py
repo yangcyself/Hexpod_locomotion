@@ -206,7 +206,7 @@ for i_episode in count(1):
 
         info = { 'Average reward': reward_batch}
         for tag, value in info.items():
-            logger.scalar_summary(tag, value, _ep)
+            logger.scalar_summary(tag, value, i_episode)
 
         torch.save(policy_net.state_dict(), './Models/' + str(i_episode) + '_actor.pt')
         torch.save(value_net.state_dict(), './Models/' + str(i_episode) + '_critic.pt')
