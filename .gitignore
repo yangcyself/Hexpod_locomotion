@@ -4,5 +4,14 @@ __pycache__/*
 actorcritic/vec_rot.txt
 actorcritic/logs/logCRAZY.txt
 actorcritic/logs/logTEST.txt
-actorcritic/.ipynb_checkpoints/*checkpoint.ipynb
+actorcritic/.ipynb_checkpoints/*
+*.ttt
+*.pkl
 .ipynb_checkpoints/*
+scene/*
+actorcritic/trpo/__pycache__/*
+lowrep/__pycache__/*
+lowrep/.ipynb_checkpoints/*
+.vscode/*
+vec_rot.txt
+actorcritic/logs/*
