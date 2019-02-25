@@ -3,7 +3,7 @@ import numpy as np
 import gym
 import sys
 sys.path.append("../")
-import oldenv as env
+import actorcritic.finalenv as env
 np.random.seed(1)
 tf.set_random_seed(1)
 
@@ -76,6 +76,7 @@ class Actor(object):
             self.t_replace_counter += 1
 
     def choose_action(self, s):
+        s = np.array(s)
         s = s[np.newaxis, :]    # single state
         return self.sess.run(self.a, feed_dict={S: s})[0]  # single action
 
@@ -202,6 +203,8 @@ actor.add_grad_to_graph(critic.a_grads)
 
 sess.run(tf.global_variables_initializer())
 
+saver=tf.train.Saver(max_to_keep=1)
+
 M = Memory(MEMORY_CAPACITY, dims=2 * state_dim + action_dim + 1)
 
 if OUTPUT_GRAPH:
@@ -210,15 +213,24 @@ if OUTPUT_GRAPH:
 var = 3  # control exploration
 
 for i in range(MAX_EPISODES):
-    s = env.reset()
+    if(OBSERVETOPO):
+        s,t = env.reset()
+        s = s+list(t.reshape(-1,))
+    else:
+        s = env.reset()
     ep_reward = 0
 
     for j in range(MAX_EP_STEPS):
 
         # Add exploration noise
         a = actor.choose_action(s)
-        a = np.clip(np.random.normal(a, var), -2, 2)    # add randomness to action selection for exploration
-        s_, r, done, info = env.step(a)
+        a = actor.choose_action(s)
+        a = np.clip(np.random.normal(a, var), -0.15, 0.15)    # add randomness to action selection for exploration
+        if(OBSERVETOPO):
+            (s_,t), r, done, info = env.step(a)
+            s_ = s+=list(t.reshape(-1,))
+        else:
+            s_, r, done, info = env.step(a)
 
         M.store_transition(s, a, r / 10, s_)
 
@@ -240,3 +252,9 @@ for i in range(MAX_EPISODES):
             print('Episode:', i, ' Reward: %i' % int(ep_reward), 'Explore: %.2f' % var, )
             if ep_reward > -300:
                 break
+        if done:
+            break
+
+    saver.save(sess, 'ddpg.ckpt', global_step=i + 1)
+
+sess.close()
