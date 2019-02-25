@@ -3,6 +3,7 @@ import numpy as np
 import gym
 import sys
 sys.path.append("../")
+from actorcritic.config import *
 import actorcritic.finalenv as env
 np.random.seed(1)
 tf.set_random_seed(1)
@@ -180,7 +181,7 @@ class Memory(object):
         return self.data[indices, :]
 
 
-state_dim = env.observation_space.shape[0]
+state_dim = 1759
 action_dim = env.action_space.shape[0]
 action_bound = env.action_space.high
 
@@ -228,7 +229,7 @@ for i in range(MAX_EPISODES):
         a = np.clip(np.random.normal(a, var), -0.15, 0.15)    # add randomness to action selection for exploration
         if(OBSERVETOPO):
             (s_,t), r, done, info = env.step(a)
-            s_ = s+=list(t.reshape(-1,))
+            s_ = s_+list(t.reshape(-1,))
         else:
             s_, r, done, info = env.step(a)
 
