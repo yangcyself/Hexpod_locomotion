@@ -109,14 +109,18 @@ def setleglength(n,l):
 
 def closeLoopSetPos(target):
     assert(target.shape == (6,3))
-    threshold = 0.01
+    threshold = 0.012
     initPos = np.zeros((6, 3))
     for i in range(6):
         _,initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     delta = target - initPos
     z_delta = np.copy(delta)
     z_delta[abs(delta) < threshold] = 0
+    adjustCount = 0
     while(np.sum(abs(z_delta))!=0):
+        adjustCount +=1
+        if(adjustCount >3):
+            break
         # print(delta)
         for i in range(6):
             if(np.sum(abs(z_delta[i]))==0):
@@ -132,7 +136,7 @@ def closeLoopSetPos(target):
         delta = target - initPos
         z_delta = np.copy(delta)
         z_delta[abs(delta) < threshold] = 0
-    print("Finished")
+    # print("Finished")
 
 
 def transTo(target,n=N): #TODO: make max step length or 
