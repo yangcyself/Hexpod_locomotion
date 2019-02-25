@@ -16,7 +16,7 @@ import string
 # import sys
 # sys.path.append("../")
 # import toyenv as env
-import oldenv as env
+import finalenv as env
 from config import*
 
 
@@ -30,17 +30,17 @@ MAX_TOTAL_REWARD = 300
 # A_DIM = env.action_space.shape[0]
 # A_MAX = env.action_space.high[0]
 
-S_DIM = 24 #1600 + 15
+S_DIM = env.observation_space.shape[0]
 if(OBSERVETOPO):
     S_DIM += 1600
 if(FUTHERTOPO):
     S_DIM += 144
 
-A_DIM = 12
+A_DIM = env.action_space.shape[0]
 # A_MAX = 0.3
 # A_MAX = 0.25
 # A_MAX = 0.09 #
-A_MAX = np.array([0.1]*6+[0.15]*2+[0.1]+[0]*2+[0.3])
+A_MAX = env.action_space.high
 
 
 print (' State Dimensions :- ', S_DIM)

@@ -13,7 +13,7 @@ from trpo.trpo import trpo_step
 from trpo.utils import *
 from config import *
 from logger import Logger,Tlogger
-import oldenv as env
+import finalenv as env
 
 torch.utils.backcompat.broadcast_warning.enabled = True
 torch.utils.backcompat.keepdim_warning.enabled = True
@@ -48,13 +48,13 @@ args = parser.parse_args()
 # num_inputs = env.observation_space.shape[0]
 # num_actions = env.action_space.shape[0]
 
-num_inputs = 24
+num_inputs = env.observation_space.shape[0]
 if(OBSERVETOPO):
     num_inputs += 1600
 if(FUTHERTOPO):
     num_inputs += 144
 
-num_actions = 12
+num_actions = env.action_space.shape[0]
 
 # env.seed(args.seed)
 # torch.manual_seed(args.seed)
@@ -165,18 +165,27 @@ for i_episode in count(1):
     i_episode += RESUME
     print("EPISODE:",i_episode)
     while num_steps < args.batch_size:
-        state = np.array(env.reset())
+        if(OBSERVETOPO):
+            state,tpo = env.reset()
+            state = np.array(state+list(tpo.reshape(-1,)))
+        else:
+            state = np.array(env.reset())
         # state = running_state(state)
         
         reward_sum = 0
         print("num_steps:",num_steps)
         for t in range(100): # Don't infinite loop while learning
+
             action = select_action(state)
             action = action.data[0].numpy()
             print("reward_sum:",reward_sum)
-            next_state, reward, done, _ = env.step(action)
+            if(OBSERVETOPO):
+                (obs,tpo), reward, done, _ = env.step(action)
+                next_state = np.array(obs+list(tpo.reshape(-1,)))
+            else:
+                next_state,reward, done, _ = env.step(action)
+                next_state = np.array(next_state)
             reward_sum += reward
-            next_state = np.array(next_state)
             # next_state = running_state(next_state)
             # print(next_state)
             mask = 1
@@ -195,11 +204,11 @@ for i_episode in count(1):
         num_steps += (t-1)
         num_episodes += 1
         reward_batch += reward_sum
+        Tlogger.refresh()
 
     reward_batch /= num_episodes
     batch = memory.sample()
     update_params(batch)
-
     if i_episode % args.log_interval == 0:
         print('Episode {}\tLast reward: {}\tAverage reward {:.2f}'.format(
             i_episode, reward_sum, reward_batch))
@@ -207,7 +216,7 @@ for i_episode in count(1):
         info = { 'Average reward': reward_batch}
         for tag, value in info.items():
             logger.scalar_summary(tag, value, i_episode)
-
+        Tlogger.refresh()
         torch.save(policy_net.state_dict(), './Models/' + str(i_episode) + '_actor.pt')
         torch.save(value_net.state_dict(), './Models/' + str(i_episode) + '_critic.pt')
         print ('Models saved successfully')

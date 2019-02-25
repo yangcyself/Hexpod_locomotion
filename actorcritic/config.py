@@ -10,25 +10,25 @@ FILEOUT = FILEOUT and ENVIRONMENT=="TOY"
 
 REFRESHTOPO = False  #是否每一轮都更新一次地图的观察，不开启这个不能在vrep运行时拖动障碍物
 # FUTHERTOPO = False
-FUTHERTOPO = False   #是否加入更多的observation，覆盖面积是原terrain观察的四倍
+FUTHERTOPO = True   #是否加入更多的observation，覆盖面积是原terrain观察的四倍
 # SETTEDTOPO = True
 SETTEDTOPO = False  #是否每个轮更新一个随机地图
-DISPLAY_OBS= False    #是否在env层面把俯视图通过matplotlib画出来
+DISPLAY_OBS= True    #是否在env层面把俯视图通过matplotlib画出来
 # MAP = "fence"     #fence 有长条形的障碍物
 MAP = None
 NOISE = False       #是否加高斯噪声
 SETMAP = False       #是否把地图设置成目标地图，用于blue
 CLIP = False         #是否设定一个迈步长度的最大值，用于blue
-LARGEMODEL = False   #使用大模型
+LARGEMODEL = True   #使用大模型
 
 POSITIVEREWARD = True #这样取一个e，可以让agent尽量学会存活 想法：curriculum学习是不是应该出了常更换任务之外还要常更换critic
 
 #Configues for topomain
-RESUME = 0          #使用哪个模型
+RESUME = 0        #使用哪个模型
 # RESUME = 3400
 # RESUME = "hopior/22000"
 LOGGING = False     #记录tensorboard以及我的textlogger
-OBSERVETOPO = False  #是否观测地形信息
+OBSERVETOPO = True  #是否观测地形信息
 TESTBEHAVE = False   #是否是测试状态，而不是带有exploration的学习状态
 
 
