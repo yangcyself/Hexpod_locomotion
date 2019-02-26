@@ -269,7 +269,6 @@ def step(action):
     assert(len(obs)==observation_space.shape[0])
     dst = distance(obs)
 
-        done = True
     if(not done):
         r = rewardFunc(np.array(difftarget[:-1]))
         tlogger.dist["rewardFunc"] = tlogger.dist.get("rewardFunc",0)+r
