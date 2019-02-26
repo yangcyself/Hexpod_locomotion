@@ -22,7 +22,12 @@ ORIPOS=np.array([[ 5.27530670e-01 , 3.04633737e-01,-5.4652e-01],
         [ 5.27622223e-01 ,-3.04508090e-01,-5.4652e-01],
         [ 1.44958496e-04 ,-6.09171569e-01,-5.4652e-01],
         [-5.27413368e-01 ,-3.04654479e-01,-5.4652e-01]])
+class observation_space:
+    shape = (15,)
 
+class action_space:
+    shape = (6,)
+    high = 0.1
 topolist = []
 
 
@@ -74,6 +79,8 @@ def refresh_TOPO():
     refresh_TOPO_util(Wall,0.25,0.5)
 
 def generate_set_TOPO():
+    if(not OBSERVETOPO):
+        return
     global topolist
     topolist = []
     generate_set_TOPO_util(Barrier,0.05,0.1)
@@ -188,7 +195,7 @@ def reset():
     obs+=list(difftarget[:-1])
 
     obs.append(SIDE)
-    assert(len(obs)==15)
+    assert(len(obs)==observation_space.shape[0])
     if (FUTHERTOPO):
         obs+=futherTopoObservation()
         
@@ -212,17 +219,17 @@ def legPainful(obs):
 rewardItems.append((legPainful,RWD_PAIN,RWDFAC_PAIN,"pain"))
 
 
-def dangerous(obs):
-    threshold = 0.6
-    rwd = 0
-    X,Y = obs[12],obs[13]
-    for x,y,r,h in topolist:
-        if(h<0.3):
-            continue
-        danger = min(0,math.sqrt((x-X)**2+(y-Y)**2)-threshold)
-        rwd -= danger**2
-    return rwd
-rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
+# def dangerous(obs):
+#     threshold = 0.6
+#     rwd = 0
+#     X,Y = obs[12],obs[13]
+#     for x,y,r,h in topolist:
+#         if(h<0.3):
+#             continue
+#         danger = min(0,math.sqrt((x-X)**2+(y-Y)**2)-threshold)
+#         rwd -= danger**2
+#     return rwd
+# rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
 
 
 def step(action):
@@ -232,7 +239,7 @@ def step(action):
     # global dist_ckp
     reward = 0
     done = False
-    assert (len(action) ==6)
+    assert (len(action) ==action_space.shape[0])
     
     oriPos = ORIPOS[[a for a in range(SIDE,6,2)]]
     action = action.reshape(3,2)
@@ -259,13 +266,9 @@ def step(action):
     # print(difftarget,end = " ")
 
     obs.append(SIDE)
-    assert(len(obs)==15)
+    assert(len(obs)==observation_space.shape[0])
     dst = distance(obs)
 
-
-    if(dst > 15):
-        reward -= 1
-        done = True
     if(not done):
         r = rewardFunc(np.array(difftarget[:-1]))
         tlogger.dist["rewardFunc"] = tlogger.dist.get("rewardFunc",0)+r

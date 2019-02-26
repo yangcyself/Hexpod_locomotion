@@ -328,6 +328,7 @@ class Hexpod(rep_obj):
                 print(x,y,z,start,end)
                 print("Leg collision with topo")
                 self.explode()
+                tlogger.dist["leg_collision_topo"] = tlogger.dist.get("leg_collision_topo",0)+1
                 break
                 # assert(len("Leg collision with topo")==0)
 
@@ -342,6 +343,7 @@ class Hexpod(rep_obj):
                 # assert(len("The Tips is in the topo")==0)
                 print("The Tips is in the topo")
                 self.explode()
+                tlogger.dist["Tips_in_topo"] = tlogger.dist.get("Tips_in_topo",0)+1
                 break
 
             elif(t.loc[2]<=TOPO(t.loc[0],t.loc[1])+0.005):
