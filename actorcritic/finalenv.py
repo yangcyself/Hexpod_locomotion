@@ -345,16 +345,16 @@ def step(action):
         reward += min(0,lastdist -  dst)
     lastdist = dst
     if(dst < 0.5):
-        reward  =20
+        reward = 40
         done = True
  
     tlogger.dist["rewardFunc"] = tlogger.dist.get("rewardFunc",0)+reward
     if(not done):
         for item, flag,fac,nam in rewardItems:
             if(flag):
-                r  = fac * item(obs)
+                r = fac * item(obs)
                 reward += r
-                tlogger.dist[nam] = tlogger.dist.get(nam,0)+r
+                tlogger.dist[nam] = tlogger.dist.get(nam, 0) + r
     # print(reward)
 
     info = None
