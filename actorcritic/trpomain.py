@@ -204,7 +204,6 @@ for i_episode in count(1):
         num_steps += (t-1)
         num_episodes += 1
         reward_batch += reward_sum
-        Tlogger.refresh()
 
     reward_batch /= num_episodes
     batch = memory.sample()
@@ -217,6 +216,9 @@ for i_episode in count(1):
         for tag, value in info.items():
             logger.scalar_summary(tag, value, i_episode)
         Tlogger.refresh()
+        for tag, value in Tlogger.dist.items():
+            logger.scalar_summary(tag, value, i_episode)
+            Tlogger.dist[tag] = 0
         torch.save(policy_net.state_dict(), './Models/' + str(i_episode) + '_actor.pt')
         torch.save(value_net.state_dict(), './Models/' + str(i_episode) + '_critic.pt')
         print ('Models saved successfully')
