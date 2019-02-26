@@ -2,8 +2,26 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5c4c7952-8263-4f95-84a8-4d10742bcb4c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/actorcritic/Experiment.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/actorcritic/Experiment.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/actorcritic/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/actorcritic/config.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/checkpoint" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/ddpg.ckpt-200.data-00000-of-00001" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/ddpg.ckpt-200.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/ddpg.ckpt-200.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551022268.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551022869.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551022947.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551023204.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551023245.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024048.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024193.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024601.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024785.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024942.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086333.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086633.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086709.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086746.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551087397.DADAS-PC" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/try_DDPG/pendulummain.py" beforeDir="false" afterPath="$PROJECT_DIR$/try_DDPG/pendulummain.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -29,12 +47,12 @@
     <session id="263690711">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="7" />
+          <entry key="project.closed" value="8" />
           <entry key="project.open.time.0" value="2" />
-          <entry key="project.open.time.1" value="3" />
+          <entry key="project.open.time.1" value="4" />
           <entry key="project.open.time.4" value="1" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="7" />
+          <entry key="project.opened" value="8" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -80,8 +98,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/try_DDPG/pendulummain.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3515">
-              <caret line="188" column="10" selection-start-line="188" selection-start-column="10" selection-end-line="188" selection-end-column="10" />
+            <state relative-caret-position="4750">
+              <caret line="253" column="10" selection-start-line="253" selection-start-column="10" selection-end-line="253" selection-end-column="10" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -102,7 +120,7 @@
         <entry file="file://$PROJECT_DIR$/actorcritic/config.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="81">
-              <caret line="34" column="25" lean-forward="true" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="25" />
+              <caret line="34" column="25" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="25" />
             </state>
           </provider>
         </entry>
@@ -110,7 +128,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/toyrep.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="366">
+            <state relative-caret-position="9557">
               <caret line="522" column="24" selection-start-line="522" selection-start-column="24" selection-end-line="522" selection-end-column="24" />
               <folding>
                 <element signature="e#23#385#1" />
@@ -198,17 +216,16 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="950" />
-    <option name="width" value="980" />
-    <option name="height" value="1160" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="width" value="1297" />
+    <option name="height" value="1398" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -230,11 +247,12 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Hexpod_locomotion_tcd" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -352,9 +370,8 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
-    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26497006" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26746505" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -406,8 +423,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/try_DDPG/pendulummain.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3515">
-          <caret line="188" column="10" selection-start-line="188" selection-start-column="10" selection-end-line="188" selection-end-column="10" />
+        <state relative-caret-position="4750">
+          <caret line="253" column="10" selection-start-line="253" selection-start-column="10" selection-end-line="253" selection-end-column="10" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>
@@ -418,6 +435,17 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="665">
           <caret line="35" column="14" selection-start-line="35" selection-start-column="14" selection-end-line="35" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/toyrep.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="9557">
+          <caret line="522" column="24" selection-start-line="522" selection-start-column="24" selection-end-line="522" selection-end-column="24" />
+          <folding>
+            <element signature="e#23#385#1" />
+            <element signature="e#387#418#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -458,21 +486,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/toyrep.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="366">
-          <caret line="522" column="24" selection-start-line="522" selection-start-column="24" selection-end-line="522" selection-end-column="24" />
-          <folding>
-            <element signature="e#23#385#1" />
-            <element signature="e#387#418#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/actorcritic/config.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="81">
-          <caret line="34" column="25" lean-forward="true" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="25" />
+          <caret line="34" column="25" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="25" />
         </state>
       </provider>
     </entry>

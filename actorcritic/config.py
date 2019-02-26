@@ -39,12 +39,7 @@ STRICT_BALANCE = True   #重心在三个落脚点的某一个区域
 TIPS_order = False      #每个脚在自己严格的60度范围内
 TIPS_distance = True    #每两个脚的夹角不能太小
 SAFE_ANGLE = False
-<<<<<<< HEAD
 FOOTRANGE = None #[0.2,2.25] # 为了方便计算，存个平方数吧 #[0.5,1.5]
-=======
-FOOTRANGE = None # 为了方便计算，存个平方数吧 #[0.5,1.5]
->>>>>>> 555c71a49fcec391c8ee11f7b591c656d8a33026
-
 DISPLAY = False         #toyrep是否可视化（3D的哦）
 
 BLUEROBOT = ENVIRONMENT=="BLUE" 
