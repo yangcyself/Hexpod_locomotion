@@ -279,13 +279,14 @@ def display():
         ax.plot(X,Y)
     x = target[0]
     y = target[1]
-    r = 0.1
+    r = 0.2
     X=[x-r,x-r,x+r,x+r,x-r]
     Y=[y-r,y+r,y+r,y-r,y-r]
     ax.plot(X,Y)
     res, loc = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
     x = loc[0]
     y = loc[1]
+    r = 0.3
     X=[x-r,x-r,x+r,x+r,x-r]
     Y=[y-r,y+r,y+r,y-r,y-r]
     ax.plot(X,Y)
@@ -375,8 +376,8 @@ def step(action):
         # ax.imshow(topoobs)
         # ax.autoscale([-5,5],[-5,5])
         
-        ax.set_xlim(-1,5)
-        ax.set_ylim(-3,3)
+        ax.set_xlim(-5,5)
+        ax.set_ylim(-5,5)
         fig.canvas.draw()
 
     if(OBSERVETOPO):
@@ -406,8 +407,8 @@ if(DISPLAY_OBS ):
     # ax.imshow(obs)
     display()
     # ax.autoscale([-5,5],[-5,5])
-    ax.set_xlim(-1,5)
-    ax.set_ylim(-3,3)
+    ax.set_xlim(-5,5)
+    ax.set_ylim(-5,5)
     # fig.canvas.draw()
     plt.show(block=False) 
 
