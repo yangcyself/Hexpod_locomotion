@@ -2,26 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5c4c7952-8263-4f95-84a8-4d10742bcb4c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/try_DDPG/checkpoint" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/ddpg.ckpt-200.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/ddpg.ckpt-200.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/ddpg.ckpt-200.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551022268.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551022869.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551022947.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551023204.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551023245.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024048.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024193.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024601.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024785.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551024942.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086333.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086633.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086709.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551086746.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/logs/events.out.tfevents.1551087397.DADAS-PC" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/try_DDPG/pendulummain.py" beforeDir="false" afterPath="$PROJECT_DIR$/try_DDPG/pendulummain.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -47,12 +28,12 @@
     <session id="263690711">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="8" />
+          <entry key="project.closed" value="9" />
           <entry key="project.open.time.0" value="2" />
           <entry key="project.open.time.1" value="4" />
-          <entry key="project.open.time.4" value="1" />
+          <entry key="project.open.time.4" value="2" />
           <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="8" />
+          <entry key="project.opened" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -69,14 +50,14 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="248" />
-          <entry key="txt" value="22" />
+          <entry key="py" value="250" />
+          <entry key="txt" value="37" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="22" />
-          <entry key="Python" value="248" />
+          <entry key="PLAIN_TEXT" value="37" />
+          <entry key="Python" value="250" />
         </counts>
       </usages-collector>
     </session>
@@ -119,8 +100,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/actorcritic/config.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="81">
-              <caret line="34" column="25" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="25" />
+            <state relative-caret-position="100">
+              <caret line="26" column="24" selection-start-line="26" selection-start-column="24" selection-end-line="26" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -217,15 +198,17 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-8" />
-    <option name="width" value="1297" />
-    <option name="height" value="1398" />
+    <option name="x" value="397" />
+    <option name="y" value="382" />
+    <option name="width" value="980" />
+    <option name="height" value="1160" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -247,7 +230,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -365,13 +347,21 @@
       <option name="project" value="LOCAL" />
       <updated>1551086782883</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="fixed some bugs">
+      <created>1551173913803</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1551173913803</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="2062" height="1126" extended-state="6" />
+    <frame x="318" y="306" width="784" height="928" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26746505" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.54683197" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -386,7 +376,7 @@
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32930514" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="12" visible="true" weight="0.32930514" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="12" visible="true" weight="0.41132075" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -403,7 +393,8 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="revised some problems" />
-    <option name="LAST_COMMIT_MESSAGE" value="revised some problems" />
+    <MESSAGE value="fixed some bugs" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed some bugs" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/try_DDPG/config.py" />
@@ -488,8 +479,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/actorcritic/config.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="81">
-          <caret line="34" column="25" selection-start-line="34" selection-start-column="25" selection-end-line="34" selection-end-column="25" />
+        <state relative-caret-position="100">
+          <caret line="26" column="24" selection-start-line="26" selection-start-column="24" selection-end-line="26" selection-end-column="24" />
         </state>
       </provider>
     </entry>
