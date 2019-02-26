@@ -28,7 +28,7 @@ import copy
 def recover(n=N):
     Lz = np.zeros(n+1)
     init_position = np.zeros((6, 3))
-    time.sleep(3)
+    # time.sleep(3)
     for i in range(6):
         res, init_position[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(1,n+1):

@@ -21,7 +21,7 @@ SETMAP = False       #是否把地图设置成目标地图，用于blue
 CLIP = False         #是否设定一个迈步长度的最大值，用于blue
 LARGEMODEL = True   #使用大模型
 
-POSITIVEREWARD = True #这样取一个e，可以让agent尽量学会存活 想法：curriculum学习是不是应该出了常更换任务之外还要常更换critic
+POSITIVEREWARD = False #这样取一个e，可以让agent尽量学会存活 想法：curriculum学习是不是应该出了常更换任务之外还要常更换critic
 
 #Configues for topomain
 RESUME = 0        #使用哪个模型
@@ -39,7 +39,11 @@ STRICT_BALANCE = True   #重心在三个落脚点的某一个区域
 TIPS_order = False      #每个脚在自己严格的60度范围内
 TIPS_distance = True    #每两个脚的夹角不能太小
 SAFE_ANGLE = False
+<<<<<<< HEAD
 FOOTRANGE = None #[0.2,2.25] # 为了方便计算，存个平方数吧 #[0.5,1.5]
+=======
+FOOTRANGE = None # 为了方便计算，存个平方数吧 #[0.5,1.5]
+>>>>>>> 555c71a49fcec391c8ee11f7b591c656d8a33026
 
 DISPLAY = False         #toyrep是否可视化（3D的哦）
 
