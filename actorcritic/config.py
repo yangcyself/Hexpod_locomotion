@@ -13,7 +13,7 @@ REFRESHTOPO = False  #是否每一轮都更新一次地图的观察，不开启�
 FUTHERTOPO = True   #是否加入更多的observation，覆盖面积是原terrain观察的四倍
 # SETTEDTOPO = True
 SETTEDTOPO = False  #是否每个轮更新一个随机地图
-DISPLAY_OBS= False    #是否在env层面把俯视图通过matplotlib画出来
+DISPLAY_OBS= True    #是否在env层面把俯视图通过matplotlib画出来
 # MAP = "fence"     #fence 有长条形的障碍物
 MAP = None
 NOISE = False       #是否加高斯噪声
@@ -24,12 +24,12 @@ LARGEMODEL = True   #使用大模型
 POSITIVEREWARD = False #这样取一个e，可以让agent尽量学会存活 想法：curriculum学习是不是应该出了常更换任务之外还要常更换critic
 
 #Configues for topomain
-RESUME = 0        #使用哪个模型
+RESUME = 76        #使用哪个模型
 # RESUME = 3400
 # RESUME = "hopior/22000"
 LOGGING = False     #记录tensorboard以及我的textlogger
 OBSERVETOPO = True  #是否观测地形信息
-TESTBEHAVE = False   #是否是测试状态，而不是带有exploration的学习状态
+TESTBEHAVE = True   #是否是测试状态，而不是带有exploration的学习状态
 
 
 #Configurations in toyrep
