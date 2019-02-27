@@ -96,7 +96,7 @@ def refresh_TOPO():
     if(MAP=="fence"):
         refresh_TOPO_util(Fence,0.05,0.1)
         return
-    refresh_TOPO_util(Barrier,0.05,0.1)
+    # refresh_TOPO_util(Barrier,0.05,0.1)
     refresh_TOPO_util(Wall,0.25,0.5)
 
 def generate_set_TOPO():
@@ -107,7 +107,7 @@ def generate_set_TOPO():
     if(MAP=="fence"):
         generate_set_TOPO_util(Fence,0.05,0.1)
         return
-    generate_set_TOPO_util(Barrier,0.05,0.1)
+    # generate_set_TOPO_util(Barrier,0.05,0.1)
     generate_set_TOPO_util(Wall,0.25,0.5)
 
 def set_map_util(obj,r,h,pos):
@@ -118,7 +118,7 @@ def set_map_util(obj,r,h,pos):
 def set_map():
     if(not OBSERVETOPO):
         return 
-    set_map_util(Barrier,0.05,0.1,[[1,0,0.05]]*12)
+    # set_map_util(Barrier,0.05,0.1,[[1,0,0.05]]*12)
     set_map_util(Wall,0.25,0.5,[[2,0,0.25]]*6)
 
 
