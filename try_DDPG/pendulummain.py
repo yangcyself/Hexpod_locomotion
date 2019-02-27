@@ -5,6 +5,7 @@ import sys
 sys.path.append("../")
 from actorcritic.config import *
 import actorcritic.finalenv as env
+from actorcritic import Tlogger
 np.random.seed(1)
 tf.set_random_seed(1)
 
@@ -331,7 +332,8 @@ for i in range(MAX_EPISODES):
         all_reward = 0
         for tag, value in info.items():
             logger.scalar_summary(tag, value, i)
-
+        for tag, value in Tlogger.dist.items():
+            logger.scalar_summary(tag, value, i)
     saver.save(sess, 'ddpg.ckpt', global_step=i + 1)
 
 sess.close()
