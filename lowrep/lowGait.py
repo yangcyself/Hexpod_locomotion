@@ -107,6 +107,9 @@ def setleglength(n,l):
     for j in range(3):
         vrep.simxSetJointTargetPosition(clientID, pole[3*n+j+1], l[j], vrep.simx_opmode_oneshot)
 
+totalerror = 0
+errorcount = 0
+
 def closeLoopSetPos(target):
     assert(target.shape == (6,3))
     threshold = 0.012
@@ -136,6 +139,12 @@ def closeLoopSetPos(target):
         delta = target - initPos
         z_delta = np.copy(delta)
         z_delta[abs(delta) < threshold] = 0
+    error = np.sqrt( np.sum(delta[0]**2))
+    global totalerror, errorcount
+    totalerror += error
+    errorcount += 1
+    print(totalerror/errorcount)
+
     # print("Finished")
 
 
@@ -250,7 +259,7 @@ def walk_a_step(length=0.3,deg=0):
     three_step_delta(np.array([[x,y,0] for i in range(3)]),0)
     three_step_delta(np.array([[x,y,0] for i in range(3)]),1)
 
-def turn_a_deg(deg):
+def turn_a_deg(deg = 0.2):
     target = np.zeros((3,3))
     for i in range(0,6,2):
         res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)

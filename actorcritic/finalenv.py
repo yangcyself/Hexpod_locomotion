@@ -213,7 +213,8 @@ def reset():
         vrep.simxSetObjectPosition(clientID, goal, -1, target,
                                vrep.simx_opmode_oneshot_wait)
 
-
+    if(RWD_PASS_WALL):
+        initialize_wall_vec()
     obs = []
     # if(BLUEROBOT):
     #     vrep.updateRobotPosition()
@@ -258,6 +259,9 @@ def legPainful(obs):
     return rwd
 rewardItems.append((legPainful,RWD_PAIN,RWDFAC_PAIN,"pain"))
 
+def unit_vec(vec):
+    return vec/np.sqrt(np.sum(vec**2))
+
 
 # def dangerous(obs):
 #     threshold = 0.6
@@ -270,6 +274,46 @@ rewardItems.append((legPainful,RWD_PAIN,RWDFAC_PAIN,"pain"))
 #         rwd -= danger**2
     # return rwd
 # rewardItems.append((dangerous,RWD_DANEROUS,RWDFAC_DANEROUS,"danger"))
+
+target_direction = None
+wall_init_vec = []
+"""
+wall_init_vec consists of tuples, the x,y position of the wall ,and the reward for passing the wall
+"""
+def initialize_wall_vec():
+    global wall_init_vec,target,target_direction
+
+    _,robot_pos = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    robot_pos = np.array(robot_pos[:2])
+    target_pos = np.array(target[:2])
+    target_direction = unit_vec(target_pos - robot_pos)
+    for x,y,r,h in topolist:
+        if(r<0.1):
+            continue
+        wall_pos = np.array([x,y])
+        robot_vec =  robot_pos - wall_pos
+        target_vec = target_pos - wall_pos
+        dot_prod = robot_vec.dot(target_vec)
+        if(dot_prod < - r**2 and unit_vec(robot_vec).dot(unit_vec(target_vec)) < -0.5 ):# r**2 代表一定在连线上，乘个2扩大一点
+            wall_init_vec.append((wall_pos,1))
+
+def pass_wall_reward( _ ):
+    global wall_init_vec
+    wall_init = []
+    rwd = 0
+    _,robot_pos = vrep.simxGetObjectPosition(clientID,BCS,-1,vrep.simx_opmode_oneshot_wait)
+    robot_pos = np.array(robot_pos[:2])
+    for wall_pos,r in wall_init_vec:
+        robot_vec =  robot_pos - wall_pos
+        if(robot_vec.dot(target_direction)>0):
+            rwd += r
+            print("passed one obj")
+        else:
+            wall_init.append((wall_pos,r))
+
+    wall_init_vec = wall_init
+    return rwd
+rewardItems.append((pass_wall_reward,RWD_PASS_WALL,RWDFAC_PASS_WALL,"pass_wall"))
 
 
 def display():

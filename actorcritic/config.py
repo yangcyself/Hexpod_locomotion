@@ -13,7 +13,7 @@ REFRESHTOPO = False  #是否每一轮都更新一次地图的观察，不开启�
 FUTHERTOPO = True   #是否加入更多的observation，覆盖面积是原terrain观察的四倍
 # SETTEDTOPO = True
 SETTEDTOPO = False  #是否每个轮更新一个随机地图
-DISPLAY_OBS= True    #是否在env层面把俯视图通过matplotlib画出来
+DISPLAY_OBS= False    #是否在env层面把俯视图通过matplotlib画出来
 # MAP = "fence"     #fence 有长条形的障碍物
 MAP = None
 NOISE = False       #是否加高斯噪声
@@ -24,7 +24,7 @@ LARGEMODEL = True   #使用大模型
 POSITIVEREWARD = False #这样取一个e，可以让agent尽量学会存活 想法：curriculum学习是不是应该出了常更换任务之外还要常更换critic
 
 #Configues for topomain
-RESUME = 76        #使用哪个模型
+RESUME = 22300        #使用哪个模型
 # RESUME = 3400
 # RESUME = "hopior/22000"
 LOGGING = False     #记录tensorboard以及我的textlogger
@@ -52,13 +52,14 @@ RWD_PAIN = True         #腿过长penalty
 RWD_DANEROUS = False    #离障碍太近 penalty #已删除
 RWD_BALANCE = True
 RWD_TORQUE = True
-
+RWD_PASS_WALL =  True
 
 #Reward factors:
 RWDFAC_PAIN = 0.1
 RWDFAC_DANEROUS = 1
 RWDFAC_BALANCE = 1
 RWDFAC_TORQUE = 1
+RWDFAC_PASS_WALL = 1
 
 assert(not (FUTHERTOPO and not OBSERVETOPO))
 assert(not (SETMAP and SETTEDTOPO ))
