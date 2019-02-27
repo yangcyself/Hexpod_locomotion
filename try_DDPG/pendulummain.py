@@ -10,8 +10,8 @@ tf.set_random_seed(1)
 
 #####################  hyper parameters  ####################
 
-MAX_EPISODES = 400
-MAX_EP_STEPS = 200
+MAX_EPISODES = 200
+MAX_EP_STEPS = 150
 LR_A = 0.001    # learning rate for actor
 LR_C = 0.001    # learning rate for critic
 GAMMA = 0.9     # reward discount
@@ -122,11 +122,13 @@ class Actor(object):
         with tf.variable_scope(scope):
             init_w = tf.random_normal_initializer(0., 0.3)
             init_b = tf.constant_initializer(0.1)
-            net = tf.layers.dense(s, 30, activation=tf.nn.relu,
+            net = tf.layers.dense(s, 1024, activation=tf.nn.relu,
                                   kernel_initializer=init_w, bias_initializer=init_b, name='l1',
                                   trainable=trainable)
+            net = tf.layers.dense(net, 256, activation=tf.nn.relu,
+                                  kernel_initializer=init_w, bias_initializer=init_b,name='l2',trainable=trainable)
             with tf.variable_scope('a'):
-                actions = tf.layers.dense(net, self.a_dim, activation=tf.nn.tanh, kernel_initializer=init_w,
+                actions = tf.layers.dense(net, 256, activation=tf.nn.tanh, kernel_initializer=init_w,
                                           bias_initializer=init_b, name='a', trainable=trainable)
                 scaled_a = tf.multiply(actions, self.action_bound, name='scaled_a')  # Scale output to -action_bound to action_bound
         return scaled_a
@@ -279,7 +281,7 @@ if OUTPUT_GRAPH:
 var = 3  # control exploration
 
 logger = Logger("./logs")
-
+all_reward = 0
 for i in range(MAX_EPISODES):
     if(OBSERVETOPO):
         s,t = env.reset()
@@ -322,10 +324,11 @@ for i in range(MAX_EPISODES):
                 break
         if done:
             break
+    all_reward += ep_reward
     if i % logRate == 0:
 
-        info = {'averageTotalReward': ep_reward / logRate}
-
+        info = {'averageTotalReward': all_reward / logRate}
+        all_reward = 0
         for tag, value in info.items():
             logger.scalar_summary(tag, value, i)
 
