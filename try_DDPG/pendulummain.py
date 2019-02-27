@@ -11,8 +11,8 @@ tf.set_random_seed(1)
 
 #####################  hyper parameters  ####################
 
-MAX_EPISODES = 200
-MAX_EP_STEPS = 150
+MAX_EPISODES = 400
+MAX_EP_STEPS = 200
 LR_A = 0.001    # learning rate for actor
 LR_C = 0.001    # learning rate for critic
 GAMMA = 0.9     # reward discount
@@ -24,7 +24,7 @@ MEMORY_CAPACITY = 10000
 BATCH_SIZE = 32
 
 OUTPUT_GRAPH = True
-logRate = 10
+logRate = 20
 
 ################ Logger ###################
 
@@ -127,9 +127,10 @@ class Actor(object):
                                   kernel_initializer=init_w, bias_initializer=init_b, name='l1',
                                   trainable=trainable)
             net = tf.layers.dense(net, 256, activation=tf.nn.relu,
-                                  kernel_initializer=init_w, bias_initializer=init_b,name='l2',trainable=trainable)
+                                  kernel_initializer=init_w, bias_initializer=init_b, name='l2',
+                                  trainable=trainable)
             with tf.variable_scope('a'):
-                actions = tf.layers.dense(net, 256, activation=tf.nn.tanh, kernel_initializer=init_w,
+                actions = tf.layers.dense(net, self.a_dim, activation=tf.nn.tanh, kernel_initializer=init_w,
                                           bias_initializer=init_b, name='a', trainable=trainable)
                 scaled_a = tf.multiply(actions, self.action_bound, name='scaled_a')  # Scale output to -action_bound to action_bound
         return scaled_a
@@ -209,14 +210,22 @@ class Critic(object):
             init_b = tf.constant_initializer(0.1)
 
             with tf.variable_scope('l1'):
-                n_l1 = 30
+                n_l1 = 1024
+                n_l2 = 256
                 w1_s = tf.get_variable('w1_s', [self.s_dim, n_l1], initializer=init_w, trainable=trainable)
+                w2_s = tf.get_variable('w2_s', [self.s_dim, n_l2], initializer=init_w, trainable=trainable)
                 w1_a = tf.get_variable('w1_a', [self.a_dim, n_l1], initializer=init_w, trainable=trainable)
+                w2_a = tf.get_variable('w2_a', [self.a_dim, n_l2], initializer=init_w, trainable=trainable)
                 b1 = tf.get_variable('b1', [1, n_l1], initializer=init_b, trainable=trainable)
+                b2 = tf.get_variable('b2', [1, n_l2], initializer=init_b, trainable=trainable)
                 net = tf.nn.relu(tf.matmul(s, w1_s) + tf.matmul(a, w1_a) + b1)
+                net2 = tf.nn.relu(tf.matmul(s, w2_s) + tf.matmul(a, w2_a) + b2)
+
 
             with tf.variable_scope('q'):
                 q = tf.layers.dense(net, 1, kernel_initializer=init_w, bias_initializer=init_b, trainable=trainable)   # Q(s,a)
+                q2 = tf.layers.dense(net2, 1, kernel_initializer=init_w, bias_initializer=init_b, trainable=trainable)
+                q = q+q2
         return q
 
     def learn(self, s, a, r, s_):
@@ -251,6 +260,7 @@ class Memory(object):
 
 state_dim = 1759
 action_dim = env.action_space.shape[0]
+print("action_dim",action_dim)
 action_bound = env.action_space.high
 
 # all placeholder for tf
@@ -294,9 +304,10 @@ for i in range(MAX_EPISODES):
     for j in range(MAX_EP_STEPS):
 
         # Add exploration noise
-        a = actor.choose_action(s)
+
         a = actor.choose_action(s)
         a = np.clip(np.random.normal(a, var), -0.15, 0.15)    # add randomness to action selection for exploration
+        print(a)
         if(OBSERVETOPO):
             (s_,t), r, done, info = env.step(a)
             s_ = s_+list(t.reshape(-1,))
@@ -306,7 +317,7 @@ for i in range(MAX_EPISODES):
         M.store_transition(s, a, r / 10, s_)
 
         if M.pointer > MEMORY_CAPACITY:
-            var *= .9995    # decay the action randomness
+            var *= .99975    # decay the action randomness
             b_M = M.sample(BATCH_SIZE)
             b_s = b_M[:, :state_dim]
             b_a = b_M[:, state_dim: state_dim + action_dim]
@@ -334,6 +345,7 @@ for i in range(MAX_EPISODES):
             logger.scalar_summary(tag, value, i)
         for tag, value in Tlogger.dist.items():
             logger.scalar_summary(tag, value, i)
-    saver.save(sess, 'ddpg.ckpt', global_step=i + 1)
+
+        saver.save(sess, 'ddpg.ckpt', global_step=i + 1)
 
 sess.close()
