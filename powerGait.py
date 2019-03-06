@@ -16,10 +16,12 @@ import copy
             传入的参数都是一个3*3的tensor，一个side取0或1代表哪组腿。
             只是delta是原来腿的位置基础上的差值
             均是以body的位置作为坐标系确定的点
-            机器人的姿态永远有两个约束，body的位置在足尖的中心点，六个腿没有扭动（角度的平均值是0）
+            ped 为None或者 three_step newpos的shape是 3,3的时候:
+                机器人的姿态永远有两个约束，body的位置在足尖的中心点，六个腿没有扭动（角度的平均值是0）
+            否则由输入控制
 用于测试和使用的更高级接口: walk_a_step(length=0.6,deg=0):
                         turn_a_deg(deg):
-辅助接口：reset(),
+辅助接口：
         print_steps()画出所有足尖相对身体的位置
 """
 
@@ -44,12 +46,6 @@ def recover(n=N):
         for j in range(1,6,2):
             vrep.simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
                                vrep.simx_opmode_oneshot_wait)
-
-# def reset():
-#     vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
-#     time.sleep(2)
-#     status = vrep.simxStartSimulation(clientID, vrep.simx_opmode_blocking)
-#     recover()
 
 def ave_ang(angs):
     angs = np.array(angs)
@@ -160,33 +156,6 @@ def three_step_delta(newpos_delta,side,peb=None):
         if(i%2==side):
             target[i][2] -=height
     transTo(target)
-    #--------------------
-    # Triangle Gait
-    # avedelta = np.sum(newpos_delta,axis=0)/6 
-
-    #lift up:
-    # initPos = np.zeros((6, 3))
-    # for i in range(6):
-    #     res, initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-
-    # target = initPos-avedelta/2
-    # for i in range(6):
-    #     if(i%2==side):
-    #         target[i] += newpos_delta[int(i/2)]/2
-    #         target[i][2] +=0.3
-
-    # target = detork(target)
-    # transTo(target)
-    # target-=avedelta/2
-    # for i in range(6):
-    #     if(i%2==side):
-    #         target[i] += newpos_delta[int(i/2)]/2
-    #         target[i][2] -=0.3
-    # target_sum = np.sum(target,axis=0)/6
-    # target_sum[2] = 0
-    # target-=target_sum
-    # target = detork(target)
-    # transTo(target)
 
 def three_step(newpos,side):
     """

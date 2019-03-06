@@ -1,12 +1,13 @@
 # -^- coding:utf-8 -^-
 """
 使用方法：
-import toyrep as vrep
+import bluerep as vrep
 N=5
 别的不变
 
 注意bluerep 和toyrep之间坐标系的区别：
     x，y需要交换，取相反数
+    这一变换在rep与机器人的接口中实现
 """
 
 import matplotlib.pyplot as plt
@@ -15,9 +16,9 @@ from mpl_toolkits.mplot3d import Axes3D
 import math
 import numpy as np
 import time
-import platform
-if(platform.system()=="Linux"):
-    import fcntl
+# import platform
+# if(platform.system()=="Linux"):
+#     import fcntl
 import slamListener
 from actorcritic.config import *
 from socket import *
@@ -141,52 +142,6 @@ class Hexpod(rep_obj):
                 self.tips.append(Botnode(loc,['TipTarget'+str(i+1),'Tip'+str(i+1)],self))
             else:
                 self.tips[i].reset(loc)
-        if(not reset):
-            self.shape_nodes=[]
-        u1_loc = [[ 1.31711960e-01,  7.59007931e-02 ,-1.78813934e-06],
-                    [ 1.38759613e-04,  1.51954651e-01 ,-1.78813934e-06],
-                    [-1.31512642e-01,  7.60353804e-02, -1.72853470e-06],
-                    [ 1.31635189e-01, -7.60723352e-02 ,-1.84774399e-06],
-                    [-1.66893005e-05, -1.51991248e-01 ,-1.90734863e-06],
-                    [-1.31590843e-01, -7.59376287e-02 ,-1.78813934e-06]]
-        u2_loc = [[ 0.27454329 , 0.0521549   ,0.11723149],
-                    [ 0.09211826 , 0.26377678  ,0.11723149],
-                    [-0.18236399 , 0.21160328  ,0.11723131],
-                    [ 0.1824851  ,-0.21164024  ,0.11723143],
-                    [-0.09199619 ,-0.2638135   ,0.11723149],
-                    [-0.27442122 ,-0.05219185  ,0.11723137]]
-        u3_loc = [[ 0.18251514 , 0.21148705  ,0.11723095],
-                    [-0.0918808  , 0.26374376  ,0.11723089],
-                    [-0.27433491 , 0.05223811  ,0.11723095],
-                    [ 0.27445745 ,-0.05227506  ,0.11723095],
-                    [ 0.09200335 ,-0.26378036  ,0.11723101],
-                    [-0.18239307 ,-0.21152413  ,0.11723095]]
-
-        for i,loc in enumerate(u1_loc):
-            if(not reset):
-                self.shape_nodes.append(Botnode(loc,'Hip'+str(i+1),self))
-            else:
-                self.shape_nodes[i].reset(loc)
-            
-        if(not reset):
-            self.shape_nodes.append(Botnode(u2_loc[0],'J21R',self))
-        else:
-            self.shape_nodes[6].reset(u2_loc[0])
-        for i,loc in enumerate(u2_loc[1:]):
-            if(not reset):
-                self.shape_nodes.append(Botnode(loc,'J21R'+str(i-1),self))
-            else:
-                self.shape_nodes[7+i].reset(loc)
-        
-        if(not reset):
-            self.shape_nodes.append(Botnode(u3_loc[0],'J31R',self))
-        else:
-            self.shape_nodes[12].reset(u3_loc[0])
-        for i,loc in enumerate(u3_loc[1:]):
-            if(not reset):
-                self.shape_nodes.append(Botnode(loc,'J31R'+str(i-1),self))
-            else:
-                self.shape_nodes[13+i].reset(loc)
 
     def reset(self):
         self.__init__(reset=True)
@@ -246,7 +201,7 @@ class Cylinder(rep_obj):
         
 
 """
-Toy-rep environment
+Blue-rep environment
 """
 hexpod = Hexpod()
 goal = Goal()
@@ -278,11 +233,12 @@ class robot_client:
     def command(self, command ,args):
         data = command+ " " + " ".join(args)
         print(data)
+        # The following line is taught by 学长李逸飞
         self.tctimeClient.send((chr(len(data)+1)+chr(0)*7+chr(1)+chr(0)*31+data+chr(0)).encode())
         res = self.tctimeClient.recv(self.BUFFSIZE)[40:].decode("utf8")
         print("RES:",res)
-        # return "POSPOS 5e-01,3e-01 0e-01,6e-01 -5e-01,3e-01 5e-01,-3e-01 0e-01,-6e-01 -5e-01,-3e-01"
         return res
+
     def __del__(self):
         # self.command("ds",[])
         # self.command("exit",[])
@@ -292,13 +248,14 @@ class fake_robot_client:
     def command(self,command,args):
         print(command, " "," ".join(args))
         return None
+
+"""
+######################################
+Set the following line when you only want to test the codes without sending commands
+######################################
+"""
 robot  = robot_client()
 # robot  = fake_robot_client()
-
-
-# def collision_check():
-#     for obj in OBJS:
-#         obj.collision_check()
 
 
 def simxFinish(num):
@@ -312,9 +269,9 @@ def simxStopSimulation(ID,opmod):
     pass
 def simxStartSimulation(ID,opmod):
     for obj in OBJS:
-        obj.reset() #如果有这一句,后面机器人就不会动，因为Handle在init的时候变掉了！！！！
+        obj.reset() 
     return 0
-    # pass
+    
 simx_opmode_blocking = None
 simx_opmode_oneshot_wait = None
 simx_opmode_oneshot = None
@@ -324,6 +281,9 @@ def listTOPO():
         print(b.loc)
 
 def parsePosition(res):
+    """
+    Parse the position in 'vec_rot.txt' and update the corresponding values
+    """
     ans = np.zeros((6,2))
     lin = res[:-1].strip()
     pos = lin.split(" ")
@@ -338,11 +298,13 @@ def parsePosition(res):
 
 
 def updateRobotPosition():
+    """
+    vec_rot.txt is used to communicate between SLAM and bluerep
+    """
     #hexpod.ori ,loc call slam
     # return
     with open("vec_rot.txt","r") as f:
         # fcntl.flock(f,fcntl.LOCK_EX)
-        
         line = f.readline()
         nums = line.split(" ")
         while (len(nums)<6):
@@ -370,6 +332,9 @@ def updateRobotPosition():
     
 
 def display():
+    """
+    Display a birdview graph, use squares to represent objects.
+    """
     for c in CLDS:
         x = c.loc[0]
         y = c.loc[1]
@@ -400,9 +365,7 @@ def simxGetObjectHandle(ID,name,opmod):
 
 
 def simxGetObjectPosition(ID, obj, cdn, opmod):
-
     obj = HANDLE[obj]
-    
     if(cdn==-1):
         #CALL SLAM API
         return 1, obj.loc
@@ -424,6 +387,7 @@ def simxSetObjectPosition(ID,obj, cdn, pos ,opmod):
         return 1
     cdn = HANDLE[cdn]
     if(obj.parent==cdn):
+        # When to set the foot position, don't use this function
         assert (len("WRONG CALL, SET TIPS POSITION")==0)
         obj.p = np.array(pos)
         return 1
@@ -436,6 +400,16 @@ def simxGetObjectOrientation(ID,obj, cdn ,opmod):
     return 1,np.array([0,0,obj.ori])
 
 def robotSetFoot(side, pee, peb):
+    """
+    The API of sf is:
+        -i means the side
+        abcdef is the x1 x2 x3 y1 y2 y3 of the foot
+        ghjklm is the body's xyz and orientation 
+    Because the coordinate system between bluerep layer and robot is not the same,
+        here we interchange x and y and set them as their negative
+
+    After the command is executed, update the robot configuration.
+    """
     print("Begin Set Foot:", side )
     command = "sf "
     args = ["-i=%d" %side]
@@ -466,16 +440,21 @@ def robotSetFoot(side, pee, peb):
 
     hexpod.ori += peb[5]
     
+    """
+    #################
+    The line before calculate the robot's configuration based on its own output
+        like a openloop controler.
+    To update the robot configuration from SLAM and robot APIS, use the following 
+        updateRobotPosition() to cover the openloop information    
+    #################
+    """
+
     updateRobotPosition()
 
     if(DISPLAY_OBS and False):
         # topoobs = topoObservation()
         ax.clear()
         display()
-        # for i in range(6):
-        #     topoobs[int((obs[i]+1)*20)][int((obs[i+1]+1)*20)] = 0.05
-        # ax.imshow(topoobs)
-        # ax.autoscale([-5,5],[-5,5])
         ax.set_xlim(-1,5)
         ax.set_ylim(-3,3)
         fig.canvas.draw()
@@ -502,47 +481,6 @@ if(DISPLAY_OBS and False):
 if __name__ == "__main__":
 
     updateRobotPosition()
-
-    # n = 30
-
-    # simxFinish(-1) # just in case, close all opened connections
-    # clientID=simxStart('127.0.0.1',19997,True,True,-500000,5) # Connect to V-REP, set a very large time-out for blocking commands
-    # if clientID!=-1:
-    #     print ('Connected to remote API server')
-    #     res = simxSynchronous(clientID, True)
-
-    # simxStartSimulation(clientID, simx_opmode_oneshot_wait)
-    # res, BCS = simxGetObjectHandle(clientID, 'BCS', simx_opmode_blocking)
-    # res, goal = simxGetObjectHandle(clientID, 'Goal', simx_opmode_blocking)
-    # S1 = np.zeros(6, dtype='int32')
-    # for i in range(0, 6):
-    #     res, S1[i] = simxGetObjectHandle(clientID, 'Tip' + str(i + 1), simx_opmode_blocking)
-    # Tip_target = np.zeros(6, dtype='int32')
-    # for i in range(0, 6):
-    #     res, Tip_target[i] = simxGetObjectHandle(clientID, 'TipTarget' + str(i + 1), simx_opmode_blocking)
-
-    # Lz = np.zeros(n+1)
-    # init_position = np.zeros((6, 3))
-
-    # # print(simxGetObjectPosition)
-    # for i in range(6):
-    #     res, init_position[i] = simxGetObjectPosition(clientID, S1[i], BCS, simx_opmode_oneshot_wait)
-    # for i in range(1,n+1):
-    #     Lz[i] = init_position[0][2] - i * 0.1/n
-
-    # for i in range(1,n+1):
-    #     for j in range(0,6,2):
-    #         simxSynchronousTrigger(clientID)
-    #         simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
-    #                      simx_opmode_oneshot_wait)
-    # # simxSynchronousTrigger(clientID)
-    # for i in range(1,n+1):
-    #     for j in range(1,6,2):
-    #         simxSynchronousTrigger(clientID)
-    #         simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
-    #                            simx_opmode_oneshot_wait)
-    # simxSynchronousTrigger(clientID)
-
 
 
 

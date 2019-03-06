@@ -1,2 +1,0 @@
-model_checkpoint_path: "ddpg.ckpt-400"
-all_model_checkpoint_paths: "ddpg.ckpt-400"

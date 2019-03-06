@@ -18,7 +18,7 @@ env: from lowGait import *
             机器人的姿态永远有两个约束，body的位置在足尖的中心点，六个腿没有扭动（角度的平均值是0）
 用于测试和使用的更高级接口: walk_a_step(length=0.6,deg=0):
                         turn_a_deg(deg):
-辅助接口：reset(),
+辅助接口：
         print_steps()画出所有足尖相对身体的位置
 
 
@@ -171,29 +171,14 @@ def detork(target):
     """
     make the position have no zhuan dong
     """
-    # dist = np.zeros(6)
     ang = np.zeros(6)
     basAng = [1,3,5,-1,-3,-5]
     basAng = np.array(basAng)*math.pi/6
     for i in range(0,6):
-        # dist[i] = math.sqrt(target[i][0]**2+target[i][1]**2)
         ang[i] = math.atan2(target[i][1],target[i][0])
-        
-    # print(ang)
-    # print(np.sum(ang)/6,-ave_ang(ang))
-    # ang-=np.sum(ang)/6
     deg = ave_ang(ang-basAng)
-    # ang -= deg
-    # deg = -ave_ang(ang)
-    # target_ = copy.deepcopy(target)
     for i in range(6):        
-        # target[i][0] = dist[i]*math.cos(ang[i])
-        # target[i][1] = dist[i]*math.sin(ang[i])
-        # print("target_")
-        # print(target_[i])
         target[i] = turnVec(target[i],-deg)
-        # print("target")
-        # print(target[i])
     return target
 
 def three_step_delta(newpos_delta,side):

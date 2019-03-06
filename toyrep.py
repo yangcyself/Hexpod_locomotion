@@ -50,10 +50,6 @@ def Handle(obj):
     return H_count
 
 def topology(x,y):
-    # if(1<x<=1.5 and -2<y<=2):
-    #     return 1
-    # if(0.4<x<0.6 and 0.45<y<0.55):
-    #     return 0.1
     if MAP=="fence":
         for f in FENCE:
             if(abs(x-f.x)<=f.r):
@@ -157,6 +153,7 @@ class Hexpod(rep_obj):
                 self.tips[i].reset(loc)
         if(not reset):
             self.shape_nodes=[]
+        #shape_nodes 用于在画图时画出机器人身体形状
         u1_loc = [[ 1.31711960e-01,  7.59007931e-02 ,-1.78813934e-06],
                     [ 1.38759613e-04,  1.51954651e-01 ,-1.78813934e-06],
                     [-1.31512642e-01,  7.60353804e-02, -1.72853470e-06],
@@ -222,11 +219,6 @@ class Hexpod(rep_obj):
         #     t.state = False
         
     def draw(self,ax):
-        # plt.clf()
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111,projection='3d')
-
-        # ax.plot([0,0,1],[0,1,1],1,"-b")
         for i,t in enumerate(self.tips):
             # ax.plot([self.loc[0],t.loc[0]],
             #         [self.loc[1],t.loc[1]],

@@ -14,7 +14,7 @@ import time
             机器人的姿态永远有两个约束，body的位置在足尖的中心点，六个腿没有扭动（角度的平均值是0）
 用于测试和使用的更高级接口: walk_a_step(length=0.6,deg=0):
                         turn_a_deg(deg):
-辅助接口：reset(),
+辅助接口：
         print_steps()画出所有足尖相对身体的位置
 """
 
@@ -41,12 +41,6 @@ def recover(n=N):
             vrep.simxSetObjectPosition(clientID, Tip_target[j], BCS, [init_position[j][0], init_position[j][1], Lz[i]],
                                vrep.simx_opmode_oneshot_wait)
 
-# def reset():
-#     vrep.simxStopSimulation(clientID, vrep.simx_opmode_blocking)
-#     time.sleep(2)
-#     status = vrep.simxStartSimulation(clientID, vrep.simx_opmode_blocking)
-#     recover()
-
 def ave_ang(angs):
     angs = np.array(angs)
     x = np.cos(angs)
@@ -64,62 +58,6 @@ def turnVec(vec,deg):
         vec[2]
     ])
 
-
-def transTo(target,n=N): #TODO: make max step length or 
-
-    assert(target.shape==(6,3))
-    initPos = np.zeros((6, 3))
-    # vrep.updateRobotPosition()
-    for i in range(6):
-        res, initPos[i] = vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-    delta = (target - initPos)/n
-#     print (delta)
-    #To make the steps smoother
-    for i in range(3):
-        initPos += delta/3
-        vrep.simxSynchronousTrigger(clientID)
-        for j in range(6):
-            vrep.simxSetObjectPosition(clientID, Tip_target[j], BCS, initPos[j],vrep.simx_opmode_oneshot_wait)
-
-    for i in range(n-2):
-        initPos += delta
-        vrep.simxSynchronousTrigger(clientID)
-        for j in range(6):
-            vrep.simxSetObjectPosition(clientID, Tip_target[j], BCS, initPos[j],vrep.simx_opmode_oneshot_wait)
-
-
-    #To make the steps smoother
-    for i in range(3):
-        initPos += delta/3
-        vrep.simxSynchronousTrigger(clientID)
-        for j in range(6):
-            vrep.simxSetObjectPosition(clientID, Tip_target[j], BCS, initPos[j],vrep.simx_opmode_oneshot_wait)
-    for j in range(6):
-        vrep.simxSetObjectPosition(clientID, Tip_target[j], BCS, target[j],vrep.simx_opmode_oneshot_wait)
-    vrep.simxSynchronousTrigger(clientID)
-
-def detork(target):
-    """
-    make the position have no zhuan dong
-    """
-    # dist = np.zeros(6)
-    ang = np.zeros(6)
-    for i in range(0,6):
-        # dist[i] = math.sqrt(target[i][0]**2+target[i][1]**2)
-        ang[i] = math.atan2(target[i][1],target[i][0])
-    # ang-=np.sum(ang)/6
-    deg = -ave_ang(ang)
-    for i in range(6):        
-        # target[i][0] = dist[i]*math.cos(ang[i])
-        # target[i][1] = dist[i]*math.sin(ang[i])
-        target[i] = turnVec(target[i],deg)
-    return target
-
-def averageOri(target):
-    ang = np.zeros(6)
-    for i in range(0,6):
-        ang[i] = math.atan2(target[i][1],target[i][0])
-    return ave_ang(ang)
 
 def bodyDiffOri(target):
     ang = np.zeros(6)
@@ -172,12 +110,6 @@ def three_step_delta(newpos,side,MOD="delta"):
     
 def three_step(newpos,side,initPos=None):
     three_step_delta(newpos,side,MOD="abslute")
-    # vrep.updateRobotPosition()
-    # if(not initPos):
-    #     initPos = np.zeros((3, 3))
-    #     for i in range(side,6,2):
-    #         res,initPos[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
-    #     three_step_delta(newpos-initPos,side)
 
 def print_steps():
     import matplotlib.pyplot as plt
@@ -200,7 +132,6 @@ def walk_a_step(length=0.3,deg=0):
 
 def turn_a_deg(deg):
     target = np.zeros((3,3))
-    # vrep.updateRobotPosition()
     for i in range(0,6,2):
         res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(3):
@@ -209,7 +140,6 @@ def turn_a_deg(deg):
         target[i][0] = dist*math.cos(ang+deg)
         target[i][1] = dist*math.sin(ang+deg)
     three_step(target,0)
-    # vrep.updateRobotPosition()
     for i in range(1,6,2):
         res,target[int(i/2)]=vrep.simxGetObjectPosition(clientID, S1[i], BCS, vrep.simx_opmode_oneshot_wait)
     for i in range(3):
@@ -258,31 +188,7 @@ if clientID!=-1:
     for i in range(0, 6):
         res, Wall[i] = vrep.simxGetObjectHandle(clientID, 'Wall' + str(i), vrep.simx_opmode_blocking)
 
-    #Retrive the U1
-    # 在腿和主题连接处。？？？
-    U1 = np.zeros(6, dtype='int32')
-    for i in range(0, 6):
-        res, U1[i] = vrep.simxGetObjectHandle(clientID, 'Hip' + str(i + 1), vrep.simx_opmode_blocking)
-    # Retrive the U2
-    # 每根腿。最上层
-    U2 = np.zeros(6, dtype='int32')
-    res, U2[0] = vrep.simxGetObjectHandle(clientID, 'J21R', vrep.simx_opmode_blocking)
-    for i in range(1, 6):
-        res, U2[i] = vrep.simxGetObjectHandle(clientID, 'J21R' + str(i - 1), vrep.simx_opmode_blocking)
-    # Retrive the U3
-    # 每根腿，最上层
-    U3 = np.zeros(6, dtype='int32')
-    res, U3[0] = vrep.simxGetObjectHandle(clientID, 'J31R', vrep.simx_opmode_blocking)
-    for i in range(1, 6):
-        res, U3[i] = vrep.simxGetObjectHandle(clientID, 'J31R' + str(i - 1), vrep.simx_opmode_blocking)
-    # Retrive the target Dummy
-    # ？？？？？
-    target_Dummy = np.zeros(6, dtype='int32')
-    for i in range(0, 6):
-        res, target_Dummy[i] = vrep.simxGetObjectHandle(clientID, 'target_Dummy' + str(i + 1),
-                                                        vrep.simx_opmode_blocking)
 
-    # Retrive the S1
     # Tip 末梢 坐标系
     S1 = np.zeros(6, dtype='int32')
     for i in range(0, 6):
