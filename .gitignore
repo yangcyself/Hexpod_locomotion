@@ -15,3 +15,12 @@ lowrep/.ipynb_checkpoints/*
 .vscode/*
 vec_rot.txt
 actorcritic/logs/*
+experiments/ezTask/ddpg.ckpt*
+actorcritic/Untitled.ipynb
+actorcritic/TerrianMapExp.ipynb
+lowrep/firstshot.pt
+lowrep/walk test.ipynb
+experiments/ezTask/__pycache__/*
+tf_DDPG/logs/*
+firstshot3.pt
+experiments/ezTask/checkpoint
