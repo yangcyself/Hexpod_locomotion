@@ -24,3 +24,8 @@ experiments/ezTask/__pycache__/*
 tf_DDPG/logs/*
 firstshot3.pt
 experiments/ezTask/checkpoint
+experiments/ezTask/ddqn/__pycache__/*
+
+experiments/ezTask/ddqn/logs/*
+experiments/ezTask/eztask1.1/*
+experiments/ezTask/logs/*

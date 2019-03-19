@@ -18,7 +18,7 @@ ORIPOS = np.array([[0,0]])
 
 FUTHERTOPO = True
 OBSERVETOPO = True
-DISPLAY_OBS = True
+DISPLAY_OBS = False
 Barrier = 20
 Wall = 10
 
