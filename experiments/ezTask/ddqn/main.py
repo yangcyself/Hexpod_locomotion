@@ -46,6 +46,8 @@ logger = Logger("./logs")
 def train(RL):
     acc_r = [0]
     total_steps = 0
+    episode = 0
+    all_reward = 0
     # observation = env.reset()
     while True:
         # if total_steps-MEMORY_SIZE > 9000: env.render()
@@ -57,21 +59,27 @@ def train(RL):
         # f_action = (action-(ACTION_SPACE-1)/2)/((ACTION_SPACE-1)/4)   # [-2 ~ 2] float actions
             (s_,t), reward, done, info = env.step(actions[action])
             observation_ = s_+list(t.reshape(-1,))
-            reward /= 10      # normalize to a range of (-1, 0)
             acc_r.append(reward + acc_r[-1])  # accumulated reward
 
             RL.store_transition(observation, action, reward, observation_)
 
             observation = observation_
-        if total_steps > MEMORY_SIZE:
-            RL.learn()
+            total_steps += 1
+            all_reward += reward
 
-        if total_steps-MEMORY_SIZE > 15000:
-            break
+            if total_steps > MEMORY_SIZE:
+                RL.learn()
 
+            if done: 
+                break
+
+
+        # if total_steps-MEMORY_SIZE > 15000:
+        #     break
+        episode += 1
         total_steps += 1
-        if(total_steps %1000 ==  0):
-            info = {'averageTotalReward': all_reward / logRate}
+        if(total_steps %100 ==  0):
+            info = {'averageTotalReward': all_reward / 100}
             all_reward = 0
             for tag, value in info.items():
                 logger.scalar_summary(tag, value, i)
