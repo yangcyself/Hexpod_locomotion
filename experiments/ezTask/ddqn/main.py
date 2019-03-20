@@ -77,14 +77,15 @@ def train(RL):
         # if total_steps-MEMORY_SIZE > 15000:
         #     break
         episode += 1
-        total_steps += 1
-        if(total_steps %100 ==  0):
+
+        if(episode %100 ==  0):
             info = {'averageTotalReward': all_reward / 100}
             all_reward = 0
             for tag, value in info.items():
                 logger.scalar_summary(tag, value, i)
-            saver.save(sess, './ddpg.ckpt', global_step=i + 1)
-
+            saver.save(sess, './ddpg.ckpt', episode=i + 1)
+        if(episode>2000):
+            break
     return RL.cost_his, acc_r
 
 # c_natural, r_natural = train(natural_DQN)
