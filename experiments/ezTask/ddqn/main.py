@@ -83,7 +83,7 @@ def train(RL):
             all_reward = 0
             for tag, value in info.items():
                 logger.scalar_summary(tag, value, i)
-            saver.save(sess, './ddpg.ckpt', episode=i + 1)
+            saver.save(sess, './ddpg.ckpt', global_step=episode + 1)
         if(episode>2000):
             break
     return RL.cost_his, acc_r
