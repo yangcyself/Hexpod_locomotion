@@ -289,7 +289,7 @@ M = Memory(MEMORY_CAPACITY, dims=2 * state_dim + action_dim + 1)
 if OUTPUT_GRAPH:
     tf.summary.FileWriter("logs/", sess.graph)
 
-var = 3  # control exploration
+var = 0.1  # control exploration
 
 logger = Logger("./logs")
 all_reward = 0
@@ -300,7 +300,6 @@ for i in range(MAX_EPISODES):
     else:
         s = env.reset()
     ep_reward = 0
-
     for j in range(MAX_EP_STEPS):
 
         # Add exploration noise

@@ -474,12 +474,12 @@ Toy-rep environment
 OBJS = [Hexpod(),Goal()]
 CLDS = []
 FENCE = []
-# for i in range(0, 12):
-#     CLDS.append(Cylinder( 0.1 , 'Barrier' + str(i)))
+for i in range(0, 12):
+    CLDS.append(Cylinder( 0.1 , 'Barrier' + str(i)))
 for i in range(0, 6):
     CLDS.append(Cylinder( 0.5 , 'Wall' + str(i)))
-for i in range(0,2):
-    FENCE.append(Fence(3+i*0.2,"Fence"+str(i)))
+# for i in range(0,2):
+#     FENCE.append(Fence(3+i*0.2,"Fence"+str(i)))
 
 # def collision_check():
 #     for obj in OBJS:
